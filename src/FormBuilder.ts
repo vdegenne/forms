@@ -135,8 +135,7 @@ export const FILTER = <T>(
 					if (!chipset) {
 						return;
 					}
-					// @ts-ignore
-					host[key] = (chipset.chips as MdFilterChip[])
+					(host[key] as (string | number)[]) = (chipset.chips as MdFilterChip[])
 						.filter((c) => c.selected)
 						.map((c) =>
 							options.type === 'string' ? c.label : choices.indexOf(c.label),
