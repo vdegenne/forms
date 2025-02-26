@@ -1,18 +1,44 @@
-import {html} from 'lit';
+import {html, Part} from 'lit';
 import {bindInput} from './bindInput.js';
 import {createRef, type Ref, ref} from 'lit/directives/ref.js';
 import {type MdChipSet} from '@material/web/chips/chip-set.js';
 import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
 
-type FilterOptions = {
+interface SharedOptions {
+	autofocus: boolean;
+}
+
+interface TextFieldOptions extends SharedOptions {
+	// TODO: find a generic type for input type
+	type: 'text' | 'number';
+}
+
+interface FilterOptions extends SharedOptions {
 	type: 'string' | 'number';
-};
+	/**
+	 * Not implemented yet.
+	 */
+	sort: 'none' | 'alphabet';
+}
 type InputOptions = {
 	availableValues: string[];
 };
 
 export class FormBuilder<T> {
 	constructor(protected host: T) {}
+
+	TEXTFIELD(
+		label: string,
+		type: string,
+		key: keyof T,
+		options?: Partial<TextFieldOptions>,
+	) {
+		return TEXTFIELD(label, this.host, key, options);
+	}
+
+	TEXTAREA(label: string, key: keyof T) {
+		return TEXTAREA(label, this.host, key);
+	}
 
 	SWITCH(headline: string, key: keyof T) {
 		return SWITCH(headline, this.host, key);
@@ -26,19 +52,11 @@ export class FormBuilder<T> {
 		return SELECT(label, this.host, key, choices);
 	}
 
-	TEXTFIELD(label: string, type: string, key: keyof T) {
-		return TEXTFIELD(label, type, this.host, key);
-	}
-
-	TEXTAREA(label: string, key: keyof T) {
-		return TEXTAREA(label, this.host, key);
-	}
-
 	FILTER(
 		label: string,
 		key: keyof T,
 		choices: string[],
-		options: Partial<FilterOptions>,
+		options?: Partial<FilterOptions>,
 	) {
 		return FILTER(label, this.host, key, choices, options);
 	}
@@ -98,18 +116,26 @@ export const SELECT = <T>(
 
 export const TEXTFIELD = <T>(
 	label: string,
-	type: string,
 	host: T,
 	key: keyof T,
-) => html`
-	<md-filled-text-field
-		label=${label.replace(/\*/g, '')}
-		type=${type}
-		${bindInput(host, key)}
-		?required=${label.includes('*')}
-	>
-	</md-filled-text-field>
-`;
+	options?: Partial<TextFieldOptions>,
+) => {
+	options = Object.assign(
+		{},
+		{type: 'text', autofocus: false} as TextFieldOptions,
+		options ?? {},
+	);
+	return html`
+		<md-filled-text-field
+			?autofocus=${options.autofocus}
+			label=${label.replace(/\*/g, '')}
+			type=${options.type}
+			${bindInput(host, key)}
+			?required=${label.includes('*')}
+		>
+		</md-filled-text-field>
+	`;
+};
 
 export const TEXTAREA = <T>(label: string, host: T, key: keyof T) => html`
 	<md-filled-text-field
@@ -126,12 +152,17 @@ export const FILTER = <T>(
 	choices: string[],
 	options?: Partial<FilterOptions>,
 ) => {
-	options = Object.assign({}, {type: 'string'}, options ?? {});
+	options = Object.assign(
+		{},
+		{type: 'string', autofocus: false} as FilterOptions,
+		options ?? {},
+	);
 	const chipsetref: Ref<MdChipSet> = createRef();
 	return html`
 		<div>
 			<div class="mb-2">${label}</div>
 			<md-chip-set
+				?autofocus=${options.autofocus}
 				${ref(chipsetref)}
 				@click=${() => {
 					const chipset = chipsetref.value;
