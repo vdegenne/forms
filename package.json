@@ -1,0 +1,7 @@
+{
+	"name": "@vdegenne/forms",
+	"version": "0.0.1",
+	"devDependencies": {
+		"lit": "^3.2.1"
+	}
+}
