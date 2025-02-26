@@ -1,5 +1,5 @@
 import {html} from 'lit';
-import {bindInput} from 'relit';
+import {bindInput} from './bindInput.js';
 
 export class FormBuilder<T> {
 	constructor(protected host: T) {}

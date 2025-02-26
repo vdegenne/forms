@@ -1,2 +1,2 @@
-export * from './FormBuilder.ts';
-export * from './bindInput.ts';
+export * from './FormBuilder.js';
+export * from './bindInput.js';
