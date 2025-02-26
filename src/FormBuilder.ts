@@ -27,12 +27,7 @@ type InputOptions = {
 export class FormBuilder<T> {
 	constructor(protected host: T) {}
 
-	TEXTFIELD(
-		label: string,
-		type: string,
-		key: keyof T,
-		options?: Partial<TextFieldOptions>,
-	) {
+	TEXTFIELD(label: string, key: keyof T, options?: Partial<TextFieldOptions>) {
 		return TEXTFIELD(label, this.host, key, options);
 	}
 
