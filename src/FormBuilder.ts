@@ -156,3 +156,15 @@ export const FILTER = <T>(
 		</div>
 	`;
 };
+
+export const INPUT = <T>(
+	label: string,
+	host: T,
+	key: keyof T,
+	options?: Partial<InputOptions>,
+) => {
+	throw new Error('Not implemented yet.');
+	return html`<!-- -->
+
+		<!-- -->`;
+};
