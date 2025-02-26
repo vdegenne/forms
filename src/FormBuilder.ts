@@ -1,5 +1,5 @@
 import {html} from 'lit';
-import {bindInput} from '@vdegenne/forms';
+import {bindInput} from './bindInput.js';
 import {createRef, type Ref, ref} from 'lit/directives/ref.js';
 import {type MdChipSet} from '@material/web/chips/chip-set.js';
 import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
