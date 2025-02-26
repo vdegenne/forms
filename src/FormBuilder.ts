@@ -1,5 +1,12 @@
 import {html} from 'lit';
-import {bindInput} from './bindInput.js';
+import {bindInput} from '@vdegenne/forms';
+import {createRef, type Ref, ref} from 'lit/directives/ref.js';
+import {type MdChipSet} from '@material/web/chips/chip-set.js';
+import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
+
+type FilterOptions = {
+	type: 'string' | 'number';
+};
 
 export class FormBuilder<T> {
 	constructor(protected host: T) {}
@@ -22,6 +29,15 @@ export class FormBuilder<T> {
 
 	TEXTAREA(label: string, key: keyof T) {
 		return TEXTAREA(label, this.host, key);
+	}
+
+	FILTER(
+		label: string,
+		key: keyof T,
+		choices: string[],
+		options: Partial<FilterOptions>,
+	) {
+		return FILTER(label, this.host, key, choices, options);
 	}
 }
 
@@ -99,3 +115,45 @@ export const TEXTAREA = <T>(label: string, host: T, key: keyof T) => html`
 		${bindInput(host, key)}
 	></md-filled-text-field>
 `;
+
+export const FILTER = <T>(
+	label: string,
+	host: T,
+	key: keyof T,
+	choices: string[],
+	options?: Partial<FilterOptions>,
+) => {
+	options = Object.assign({}, {type: 'string'}, options ?? {});
+	const chipsetref: Ref<MdChipSet> = createRef();
+	return html`
+		<div>
+			<div class="mb-2">${label}</div>
+			<md-chip-set
+				${ref(chipsetref)}
+				@click=${() => {
+					const chipset = chipsetref.value;
+					if (!chipset) {
+						return;
+					}
+					// @ts-ignore
+					host[key] = (chipset.chips as MdFilterChip[])
+						.filter((c) => c.selected)
+						.map((c) =>
+							options.type === 'string' ? c.label : choices.indexOf(c.label),
+						);
+				}}
+			>
+				${choices.map(
+					(choice, index) => html`
+						<md-filter-chip
+							?selected=${(host[key] as (string | number)[]).includes(
+								options.type === 'string' ? choice : index,
+							)}
+							label=${choice}
+						></md-filter-chip>
+					`,
+				)}
+			</md-chip-set>
+		</div>
+	`;
+};
