@@ -7,6 +7,9 @@ import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
 type FilterOptions = {
 	type: 'string' | 'number';
 };
+type InputOptions = {
+	availableValues: string[];
+};
 
 export class FormBuilder<T> {
 	constructor(protected host: T) {}
