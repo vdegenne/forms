@@ -13,13 +13,6 @@ interface TextFieldOptions extends SharedOptions {
 	type: 'text' | 'number';
 }
 
-interface FilterOptions extends SharedOptions {
-	type: 'string' | 'number';
-	/**
-	 * Not implemented yet.
-	 */
-	sort: 'none' | 'alphabet';
-}
 type InputOptions = {
 	availableValues: string[];
 };
@@ -140,6 +133,23 @@ export const TEXTAREA = <T>(label: string, host: T, key: keyof T) => html`
 	></md-filled-text-field>
 `;
 
+interface FilterOptions extends SharedOptions {
+	/**
+	 * Can't unselect all if true
+	 *
+	 * @default false
+	 */
+	atLeastOne: boolean;
+	/**
+	 * @default string
+	 */
+	type: 'string' | 'number';
+	/**
+	 * Not implemented yet.
+	 */
+	sort: 'none' | 'alphabet';
+}
+
 export const FILTER = <T>(
 	label: string,
 	host: T,
@@ -149,7 +159,7 @@ export const FILTER = <T>(
 ) => {
 	options = Object.assign(
 		{},
-		{type: 'string', autofocus: false} as FilterOptions,
+		{type: 'string', autofocus: false, atLeastOne: false} as FilterOptions,
 		options ?? {},
 	);
 	const chipsetref: Ref<MdChipSet> = createRef();
@@ -159,10 +169,14 @@ export const FILTER = <T>(
 			<md-chip-set
 				?autofocus=${options.autofocus}
 				${ref(chipsetref)}
-				@click=${() => {
-					const chipset = chipsetref.value;
-					if (!chipset) {
-						return;
+				@click=${(event: Event) => {
+					const chipset = chipsetref.value!;
+					if (
+						options.atLeastOne &&
+						(chipset.chips as MdFilterChip[]).filter((c) => c.selected)
+							.length === 0
+					) {
+						event.preventDefault();
 					}
 					(host[key] as (string | number)[]) = (chipset.chips as MdFilterChip[])
 						.filter((c) => c.selected)
