@@ -1,11 +1,11 @@
-import {directive, AsyncDirective} from 'lit/async-directive.js';
 import {nothing} from 'lit';
+import {AsyncDirective, directive} from 'lit/async-directive.js';
 import type {
-	ElementPart,
-	DirectiveParameters,
-	PartInfo,
-	DirectiveResult,
 	DirectiveClass,
+	DirectiveParameters,
+	DirectiveResult,
+	ElementPart,
+	PartInfo,
 } from 'lit/directive.js';
 import {PartType} from 'lit/directive.js';
 
