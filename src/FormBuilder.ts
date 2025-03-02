@@ -167,6 +167,7 @@ export const FILTER = <T>(
 		<div>
 			<div class="mb-2">${label}</div>
 			<md-chip-set
+				class="justify-stretch"
 				?autofocus=${options.autofocus}
 				${ref(chipsetref)}
 				@click=${(event: Event) => {
@@ -177,6 +178,7 @@ export const FILTER = <T>(
 							.length === 0
 					) {
 						event.preventDefault();
+						return;
 					}
 					(host[key] as (string | number)[]) = (chipset.chips as MdFilterChip[])
 						.filter((c) => c.selected)
