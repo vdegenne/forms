@@ -1,6 +1,6 @@
 {
 	"name": "@vdegenne/forms",
-	"version": "0.0.9",
+	"version": "0.1.8",
 	"type": "module",
 	"scripts": {
 		"build": "wireit"
@@ -19,18 +19,32 @@
 		}
 	},
 	"devDependencies": {
-		"@material/web": "^2.2.0",
-		"lit": "^3.2.1",
-		"typescript": "^5.8.2",
-		"wireit": "^0.14.11"
+		"@material/web": "^2.3.0",
+		"@vdegenne/debouncer": "^1.0.3",
+		"lit": "^3.3.0",
+		"typescript": "^5.8.3",
+		"wireit": "^0.14.12"
+	},
+	"peerDependencies": {
+		"@material/web": "^2.0.0",
+		"@vdegenne/debouncer": "^1.0.0",
+		"lit": "^3.0.0"
 	},
 	"files": [
 		"./lib/"
 	],
 	"exports": {
 		".": {
-			"default": "./lib/index.js",
+			"import": "./lib/index.js",
 			"types": "./lib/index.d.ts"
+		},
+		"./FormBuilder": {
+			"import": "./lib/FormBuilder.js",
+			"types": "./lib/FormBuilder.d.ts"
+		},
+		"./bindInput": {
+			"import": "./lib/bindInput.js",
+			"types": "./lib/bindInput.d.ts"
 		}
 	}
 }

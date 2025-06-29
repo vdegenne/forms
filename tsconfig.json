@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "node",
-		"strict": true,
+		"target": "esnext",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
+		"strict": false,
 		"useDefineForClassFields": false,
 		"experimentalDecorators": true,
 		"outDir": "./lib",
