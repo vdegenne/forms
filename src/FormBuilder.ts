@@ -415,7 +415,10 @@ export const TEXTFIELD = <T>(
 		? html`<md-icon-button
 				slot="trailing-icon"
 				form=""
-				@click=${() => ((<string>host[key]) = '')}
+				@click=${() => {
+					(<string>host[key]) = '';
+					textfield().focus();
+				}}
 				><md-icon>clear</md-icon></md-icon-button
 			>`
 		: null;
