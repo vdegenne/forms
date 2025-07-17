@@ -352,6 +352,9 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	 */
 	rows: number;
 
+	/**
+	 * @default false
+	 */
 	resetButton: boolean;
 
 	onInput: ((params: OnInputParameters) => OnInputReturnType) | undefined;
@@ -370,7 +373,7 @@ export const TEXTFIELD = <T>(
 		suffixText: undefined,
 		style: 'outlined',
 		rows: 2,
-		resetButton: true,
+		resetButton: false,
 		onInput: undefined,
 		disabled: false,
 		...options,
