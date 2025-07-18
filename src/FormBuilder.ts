@@ -444,7 +444,7 @@ export const TEXTFIELD = <T>(
 						suffix-text=${ifDefined(_options.suffixText)}
 						.value=${host[key]}
 						@input=${() => ((<string>host[key]) = textfield().value)}
-						styles=${ifDefined(_options.styles)}
+						style=${ifDefined(_options.styles)}
 						>${content}</md-outlined-text-field
 					>
 				`
@@ -461,7 +461,7 @@ export const TEXTFIELD = <T>(
 						suffix-text=${ifDefined(_options.suffixText)}
 						.value=${host[key]}
 						@input=${() => ((<string>host[key]) = textfield().value)}
-						styles=${ifDefined(_options.styles)}
+						style=${ifDefined(_options.styles)}
 						>${content}</md-filled-text-field
 					>
 				`}
