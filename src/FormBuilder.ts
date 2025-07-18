@@ -287,6 +287,9 @@ export function CHIPSELECT<T>(
 	const menuRef = createRef<MdMenu>();
 	const chipRef = createRef<MdInputChip>();
 
+	import('@material/web/menu/menu.js');
+	import('@material/web/menu/menu-item.js');
+
 	return html`
 		<md-chip-set class="relative">
 			<md-input-chip
