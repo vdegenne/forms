@@ -2,6 +2,8 @@ import {type MdChipSet} from '@material/web/chips/chip-set.js';
 import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
 import {MdInputChip} from '@material/web/chips/input-chip.js';
 import {type Chip} from '@material/web/chips/internal/chip.js';
+import {type MdIconButton} from '@material/web/iconbutton/icon-button.js';
+import {type IconButton} from '@material/web/iconbutton/internal/icon-button.js';
 import type {CloseMenuEvent, MdMenu} from '@material/web/menu/menu.js';
 import {type MdFilledSelect} from '@material/web/select/filled-select.js';
 import {type Select} from '@material/web/select/internal/select.js';
@@ -42,6 +44,10 @@ export class FormBuilder<T> {
 
 	TEXTAREA(label: string, key: keyof T, options?: Partial<TextFieldOptions>) {
 		return TEXTAREA(label, this.host, key, options);
+	}
+
+	TOGGLEBUTTON(key: keyof T, options?: Partial<ToggleButtonOptions>) {
+		return TOGGLEBUTTON(this.host, key, options);
 	}
 
 	SWITCH(
@@ -269,7 +275,7 @@ interface ChipSelectOptions extends SharedOptions<Chip> {
 	/**
 	 * @default 'sort'
 	 */
-	leadingIcon: string | undefined;
+	leadingIcon: string | TemplateResult | undefined;
 }
 
 MdInputChip.elementStyles.push(css`
@@ -288,7 +294,7 @@ export function CHIPSELECT<T>(
 	const _options: ChipSelectOptions = {
 		autofocus: false,
 		init: undefined,
-		leadingIcon: 'sort',
+		leadingIcon: html`<md-icon>sort</md-icon>`,
 		disabled: false,
 		required: false,
 		...(options ?? {}),
@@ -314,7 +320,9 @@ export function CHIPSELECT<T>(
 				positioning="popover"
 			>
 				${_options.leadingIcon
-					? html`<md-icon slot="icon">${_options.leadingIcon}</md-icon>`
+					? typeof _options.leadingIcon === 'string'
+						? html`<md-icon slot="icon">${_options.leadingIcon}</md-icon>`
+						: html`<div slot="icon">${_options.leadingIcon}</div>`
 					: null}
 				<span>${host[key]}</span>
 				<md-icon
@@ -377,12 +385,12 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	leadingIcon: string | TemplateResult | undefined;
 }
 
-export const TEXTFIELD = <T>(
+export function TEXTFIELD<T>(
 	label: string,
 	host: T,
 	key: keyof T,
 	options?: Partial<TextFieldOptions>,
-) => {
+) {
 	const _options: TextFieldOptions = {
 		autofocus: false,
 		init: undefined,
@@ -395,7 +403,7 @@ export const TEXTFIELD = <T>(
 		disabled: false,
 		leadingIcon: undefined,
 		required: false,
-		...options,
+		...(options ?? {}),
 	};
 	const promisesToWait = [];
 	let style: StaticValue;
@@ -494,7 +502,7 @@ export const TEXTFIELD = <T>(
 	// 	'',
 	// );
 	return render();
-};
+}
 
 export const TEXTAREA = <T>(
 	label: string,
@@ -658,4 +666,47 @@ async function registerEvents<T extends HTMLElement = HTMLElement>(
 	const element = await waitElement(getElement);
 	events.init?.(element);
 	return element;
+}
+
+interface ToggleButtonOptions extends SharedOptions<IconButton> {
+	icon: string | TemplateResult;
+	selectedIcon: string | TemplateResult;
+}
+export function TOGGLEBUTTON<T>(
+	// label: string,
+	host: T,
+	key: keyof T,
+	options?: Partial<ToggleButtonOptions>,
+) {
+	const icon = options?.icon ?? 'close';
+	const _options: ToggleButtonOptions = {
+		icon,
+		selectedIcon: icon === 'close' && !options?.selectedIcon ? 'check' : icon,
+		// Shared
+		disabled: false,
+		autofocus: false,
+		required: true,
+		init: undefined,
+		...(options ?? {}),
+	};
+	return html`
+		<md-filled-icon-button
+			toggle
+			form=""
+			?selected=${host[key]}
+			@change=${(event: Event) => {
+				const target = event.target as MdIconButton;
+				(<boolean>host[key]) = target.selected;
+			}}
+		>
+			${typeof _options.icon === 'string'
+				? html`<md-icon>${_options.icon}</md-icon>`
+				: _options.icon}
+			<div slot="selected">
+				${typeof _options.selectedIcon === 'string'
+					? html`<md-icon>${_options.selectedIcon}</md-icon>`
+					: _options.selectedIcon}
+			</div>
+		</md-filled-icon-button>
+	`;
 }
