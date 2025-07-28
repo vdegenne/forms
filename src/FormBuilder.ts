@@ -322,7 +322,9 @@ export function CHIPSELECT<T>(
 				${_options.leadingIcon
 					? typeof _options.leadingIcon === 'string'
 						? html`<md-icon slot="icon">${_options.leadingIcon}</md-icon>`
-						: html`<div slot="icon">${_options.leadingIcon}</div>`
+						: html`<div slot="icon" style="--md-icon-size:18px;">
+								${_options.leadingIcon}
+							</div>`
 					: null}
 				<span>${host[key]}</span>
 				<md-icon
