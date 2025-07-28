@@ -13,13 +13,20 @@ import Debouncer from '@vdegenne/debouncer';
 import {css, html, type TemplateResult} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import {createRef, type Ref, ref} from 'lit/directives/ref.js';
-import {literal, type StaticValue} from 'lit/static-html.js';
+import {
+	literal,
+	html as staticHtml,
+	type StaticValue,
+} from 'lit/static-html.js';
+import {bindInput} from './bindInput.js';
 
 interface SharedOptions<T> {
 	autofocus: boolean;
 	init: ((element: T) => void) | undefined;
 	disabled: boolean;
 	styles?: string;
+	/** @default false */
+	required: boolean;
 }
 
 type InputOptions = {
@@ -94,6 +101,7 @@ export const SWITCH = <T>(
 		overline: undefined,
 		checkbox: false,
 		disabled: false,
+		required: false,
 		...options,
 	};
 	return html`
@@ -174,6 +182,7 @@ export const SLIDER = <T>(
 		ticks: false,
 		persistLabel: false,
 		disabled: false,
+		required: false,
 		...options,
 	};
 
@@ -281,6 +290,7 @@ export function CHIPSELECT<T>(
 		init: undefined,
 		leadingIcon: 'sort',
 		disabled: false,
+		required: false,
 		...(options ?? {}),
 	};
 
@@ -356,11 +366,15 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	rows: number;
 
 	/**
-	 * @default false
+	 * @default undefined
 	 */
-	resetButton: boolean;
+	resetButton:
+		| {icon?: string | TemplateResult; callback?: () => void}
+		| undefined;
 
 	onInput: ((params: OnInputParameters) => OnInputReturnType) | undefined;
+
+	leadingIcon: string | TemplateResult | undefined;
 }
 
 export const TEXTFIELD = <T>(
@@ -376,96 +390,110 @@ export const TEXTFIELD = <T>(
 		suffixText: undefined,
 		style: 'outlined',
 		rows: 2,
-		resetButton: false,
+		resetButton: undefined,
 		onInput: undefined,
 		disabled: false,
+		leadingIcon: undefined,
+		required: false,
 		...options,
 	};
+	const promisesToWait = [];
 	let style: StaticValue;
 	switch (_options.style) {
 		case 'filled':
-			import('@material/web/textfield/filled-text-field.js');
+			promisesToWait.push(
+				import('@material/web/textfield/filled-text-field.js'),
+			);
 			style = literal`filled`;
 			break;
 
 		case 'outlined':
-			import('@material/web/textfield/outlined-text-field.js');
+			promisesToWait.push(
+				import('@material/web/textfield/outlined-text-field.js'),
+			);
 			style = literal`outlined`;
 			break;
 	}
 
-	const textFieldRef = createRef<TextField>();
-	const textfield = () => textFieldRef.value;
+	const render = () => {
+		const textFieldRef = createRef<TextField>();
+		const textfield = () => textFieldRef.value;
 
-	registerEvents(textfield, {init: _options.init}).then((textfield) => {
-		if (_options.onInput) {
-			const {errorText, supportingText} =
-				_options.onInput?.({
-					textfield,
-					value: textfield.value,
-				}) ?? {};
-			if (errorText) {
-				textfield.errorText = errorText;
+		registerEvents(textfield, {init: _options.init}).then((textfield) => {
+			if (_options.onInput) {
+				const {errorText, supportingText} =
+					_options.onInput?.({
+						textfield,
+						value: textfield.value,
+					}) ?? {};
+				if (errorText) {
+					textfield.errorText = errorText;
+				}
+				if (supportingText) {
+					textfield.supportingText = supportingText;
+				}
 			}
-			if (supportingText) {
-				textfield.supportingText = supportingText;
-			}
+		});
+
+		if (_options.resetButton) {
+			import('@material/web/iconbutton/icon-button.js');
 		}
-	});
 
-	if (_options.resetButton) {
-		import('@material/web/iconbutton/icon-button.js');
-	}
+		const resetButtonOrNot = _options.resetButton
+			? html`<md-icon-button
+					slot="trailing-icon"
+					form=""
+					@click=${() => {
+						if (_options.resetButton.callback) {
+							_options.resetButton.callback();
+						} else {
+							(<string>host[key]) = '';
+							textfield().focus();
+						}
+					}}
+				>
+					${_options.resetButton
+						? typeof _options.resetButton.icon === 'string'
+							? html`<md-icon>${_options.resetButton.icon}</md-icon>`
+							: _options.resetButton.icon
+						: html`<md-icon>clear</md-icon>`}
+				</md-icon-button>`
+			: null;
 
-	const content = _options.resetButton
-		? html`<md-icon-button
-				slot="trailing-icon"
-				form=""
-				@click=${() => {
-					(<string>host[key]) = '';
-					textfield().focus();
-				}}
-				><md-icon>clear</md-icon></md-icon-button
-			>`
-		: null;
-
-	return html`
-		${_options.style === 'outlined'
-			? html`
-					<md-outlined-text-field
-						?disabled=${_options.disabled}
-						${ref(textFieldRef)}
-						class="flex-1"
-						?autofocus=${_options.autofocus}
-						label=${label.replace(/\*/g, '')}
-						type=${_options.type}
-						.rows=${_options.rows}
-						?required=${label.includes('*')}
-						suffix-text=${ifDefined(_options.suffixText)}
-						.value=${host[key]}
-						@input=${() => ((<string>host[key]) = textfield().value)}
-						style=${ifDefined(_options.styles)}
-						>${content}</md-outlined-text-field
-					>
-				`
-			: html`
-					<md-filled-text-field
-						?disabled=${_options.disabled}
-						${ref(textFieldRef)}
-						class="flex-1"
-						?autofocus=${_options.autofocus}
-						label=${label.replace(/\*/g, '')}
-						type=${_options.type}
-						.rows=${_options.rows}
-						?required=${label.includes('*')}
-						suffix-text=${ifDefined(_options.suffixText)}
-						.value=${host[key]}
-						@input=${() => ((<string>host[key]) = textfield().value)}
-						style=${ifDefined(_options.styles)}
-						>${content}</md-filled-text-field
-					>
-				`}
+		return staticHtml`
+		<md-${style}-text-field
+			?disabled=${_options.disabled}
+			${ref(textFieldRef)}
+			class="flex-1"
+			?autofocus=${_options.autofocus}
+			label=${label.replace(/\*/g, '')}
+			type=${_options.type}
+			.rows=${_options.rows}
+			?required=${_options.required || label.includes('*')}
+			suffix-text=${ifDefined(_options.suffixText)}
+			${bindInput(host, key)}
+			style=${ifDefined(_options.styles)}
+		>
+		${
+			_options.leadingIcon
+				? typeof _options.leadingIcon === 'string'
+					? html`<md-icon slot="leading-icon">${_options.leadingIcon}</md-icon>`
+					: html`<div slot="leading-icon">${_options.leadingIcon}</div>`
+				: null
+		}
+		${resetButtonOrNot}
+		</md-${style}-text-field>
 	`;
+	};
+
+	// return until(
+	// 	(async () => {
+	// 		await Promise.all(promisesToWait);
+	// 		return render();
+	// 	})(),
+	// 	'',
+	// );
+	return render();
 };
 
 export const TEXTAREA = <T>(
@@ -521,6 +549,7 @@ export const FILTER = <T>(
 		type: 'string',
 		elevated: false,
 		disabled: false,
+		required: false,
 		...(options ?? {}),
 	};
 	const _choices = choices
