@@ -1,6 +1,6 @@
 import {type MdChipSet} from '@material/web/chips/chip-set.js';
 import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
-import {MdInputChip} from '@material/web/chips/input-chip.js';
+import {type MdInputChip} from '@material/web/chips/input-chip.js';
 import {type Chip} from '@material/web/chips/internal/chip.js';
 import {type MdIconButton} from '@material/web/iconbutton/icon-button.js';
 import {type IconButton} from '@material/web/iconbutton/internal/icon-button.js';
@@ -12,7 +12,7 @@ import {type MdSlider} from '@material/web/slider/slider.js';
 import {type Switch} from '@material/web/switch/internal/switch.js';
 import {type TextField} from '@material/web/textfield/internal/text-field.js';
 import Debouncer from '@vdegenne/debouncer';
-import {css, html, type TemplateResult} from 'lit';
+import {html, type TemplateResult} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import {createRef, type Ref, ref} from 'lit/directives/ref.js';
 import {
@@ -110,6 +110,8 @@ export const SWITCH = <T>(
 		required: false,
 		...options,
 	};
+	import('@material/web/list/list-item.js');
+	import('@material/web/switch/switch.js');
 	return html`
 		<md-list-item
 			type="button"
@@ -170,12 +172,12 @@ interface SliderOptions extends SharedOptions<Slider> {
 	persistLabel: boolean;
 }
 
-export const SLIDER = <T>(
-	label: string,
+export function SLIDER<T>(
+	label: string | TemplateResult,
 	host: T,
 	key: keyof T,
 	options?: Partial<SliderOptions>,
-) => {
+) {
 	const _options: SliderOptions = {
 		autofocus: false,
 		init: undefined,
@@ -234,7 +236,7 @@ export const SLIDER = <T>(
 			</md-slider>
 		</div>
 	`;
-};
+}
 
 interface SelectOptions extends SharedOptions<Select> {
 	/**
@@ -278,11 +280,11 @@ interface ChipSelectOptions extends SharedOptions<Chip> {
 	leadingIcon: string | TemplateResult | undefined;
 }
 
-MdInputChip.elementStyles.push(css`
-	button.trailing.action {
-		pointer-events: none;
-	}
-`);
+// MdInputChip.elementStyles.push(css`
+// 	button.trailing.action {
+// 		pointer-events: none;
+// 	}
+// `);
 
 export function CHIPSELECT<T>(
 	label: string,
@@ -411,16 +413,16 @@ export function TEXTFIELD<T>(
 	let style: StaticValue;
 	switch (_options.style) {
 		case 'filled':
-			promisesToWait.push(
-				import('@material/web/textfield/filled-text-field.js'),
-			);
+			// promisesToWait.push(
+			// 	import('@material/web/textfield/filled-text-field.js'),
+			// );
 			style = literal`filled`;
 			break;
 
 		case 'outlined':
-			promisesToWait.push(
-				import('@material/web/textfield/outlined-text-field.js'),
-			);
+			// promisesToWait.push(
+			// 	import('@material/web/textfield/outlined-text-field.js'),
+			// );
 			style = literal`outlined`;
 			break;
 	}

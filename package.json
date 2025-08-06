@@ -1,6 +1,6 @@
 {
 	"name": "@vdegenne/forms",
-	"version": "0.1.25",
+	"version": "0.1.26",
 	"type": "module",
 	"scripts": {
 		"build": "wireit"
@@ -26,9 +26,9 @@
 		"wireit": "^0.14.12"
 	},
 	"peerDependencies": {
-		"@material/web": "^2.3.0",
+		"@material/web": "^2.0.0",
 		"@vdegenne/debouncer": "^1.0.3",
-		"lit": "^3.3.1"
+		"lit": "^3.0.0"
 	},
 	"files": [
 		"./lib/"
