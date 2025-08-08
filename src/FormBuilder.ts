@@ -58,7 +58,11 @@ export class FormBuilder<T> {
 		return SWITCH(headline, this.host, key, options);
 	}
 
-	SLIDER(label: string, key: keyof T, options?: Partial<SliderOptions>) {
+	SLIDER(
+		label: string | TemplateResult,
+		key: keyof T,
+		options?: Partial<SliderOptions>,
+	) {
 		return SLIDER(label, this.host, key, options);
 	}
 
