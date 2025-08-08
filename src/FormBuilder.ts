@@ -94,12 +94,12 @@ interface SwitchOptions extends SharedOptions<Switch> {
 	checkbox: boolean;
 }
 
-export const SWITCH = <T>(
+export function SWITCH<T>(
 	headline: string | TemplateResult,
 	host: T,
 	key: keyof T,
 	options?: Partial<SwitchOptions>,
-) => {
+) {
 	const _options: SwitchOptions = {
 		autofocus: false,
 		init: undefined,
@@ -137,7 +137,7 @@ export const SWITCH = <T>(
 				: null}
 		</md-list-item>
 	`;
-};
+}
 
 interface SliderOptions extends SharedOptions<Slider> {
 	min: number;
@@ -213,6 +213,8 @@ export function SLIDER<T>(
 			}
 		}
 	}
+
+	import('@material/web/slider/slider.js');
 
 	return html`
 		<div class="flex items-center gap-3 flex-1">
