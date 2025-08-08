@@ -224,6 +224,7 @@ export function SLIDER<T>(
 		<div class="flex items-center gap-3 flex-1">
 			<span>${label}</span>
 			<md-slider
+				?disabled=${_options.disabled}
 				${ref(sliderRef)}
 				?persist-label=${_options.persistLabel}
 				class="flex-1"
