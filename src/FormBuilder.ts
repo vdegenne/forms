@@ -11,7 +11,7 @@ import {type Slider} from '@material/web/slider/internal/slider.js';
 import {type MdSlider} from '@material/web/slider/slider.js';
 import {type Switch} from '@material/web/switch/internal/switch.js';
 import {type TextField} from '@material/web/textfield/internal/text-field.js';
-import Debouncer from '@vdegenne/debouncer';
+import {Debouncer} from '@vdegenne/debouncer';
 import {html, type TemplateResult} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import {createRef, type Ref, ref} from 'lit/directives/ref.js';
