@@ -222,7 +222,7 @@ export function SLIDER<T>(
 
 	return html`
 		<div class="flex items-center gap-3 flex-1">
-			<span>${label}</span>
+			${label ? html`<span>${label}</span>` : null}
 			<md-slider
 				?disabled=${_options.disabled}
 				${ref(sliderRef)}
