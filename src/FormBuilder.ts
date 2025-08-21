@@ -297,7 +297,7 @@ export function CHIPSELECT<T>(
 	label: string,
 	host: T,
 	key: keyof T,
-	choices: string[],
+	choices: readonly string[],
 	options?: Partial<ChipSelectOptions>,
 ) {
 	const _options: ChipSelectOptions = {
