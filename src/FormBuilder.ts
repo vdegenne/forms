@@ -314,6 +314,8 @@ export function CHIPSELECT<T>(
 
 	import('@material/web/menu/menu.js');
 	import('@material/web/menu/menu-item.js');
+	import('@material/web/chips/chip-set.js');
+	import('@material/web/chips/input-chip.js');
 
 	return html`
 		<md-chip-set class="relative">
