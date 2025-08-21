@@ -38,6 +38,11 @@ type InputOptions = {
 export class FormBuilder<T> {
 	constructor(protected host: T) {}
 
+	/**
+	 * import '@material/web/textfield/filled-text-field.js';
+	 * import '@material/web/textfield/outlined-text-field.js';
+	 * import '@material/web/iconbutton/icon-button.js';
+	 */
 	TEXTFIELD(label: string, key: keyof T, options?: Partial<TextFieldOptions>) {
 		return TEXTFIELD(label, this.host, key, options);
 	}
@@ -50,6 +55,11 @@ export class FormBuilder<T> {
 		return TOGGLEBUTTON(this.host, key, options);
 	}
 
+	/**
+	 * import '@material/web/list/list-item.js';
+	 * import '@material/web/switch/switch.js';
+	 * import '@material/web/checkbox/checkbox.js';
+	 */
 	SWITCH(
 		headline: string | TemplateResult,
 		key: keyof T,
@@ -58,6 +68,9 @@ export class FormBuilder<T> {
 		return SWITCH(headline, this.host, key, options);
 	}
 
+	/**
+	 * import '@material/web/slider/slider.js'
+	 */
 	SLIDER(
 		label: string | TemplateResult,
 		key: keyof T,
@@ -70,6 +83,14 @@ export class FormBuilder<T> {
 		return SELECT(label, this.host, key, choices);
 	}
 
+	/**
+	 * import '@material/web/chips/chip-set.js'
+	 * import '@material/web/chips/input-chip.js'
+	 * import '@material/web/menu/menu.js'
+	 * import '@material/web/menu/menu-item.js'
+	 *
+	 * <!-- <md-chip-set><md-input-chip><md-menu><md-menu-item> -->
+	 */
 	CHIPSELECT(
 		label: string,
 		key: keyof T,
@@ -98,6 +119,11 @@ interface SwitchOptions extends SharedOptions<Switch> {
 	checkbox: boolean;
 }
 
+/**
+ * import '@material/web/list/list-item.js';
+ * import '@material/web/switch/switch.js';
+ * import '@material/web/checkbox/checkbox.js';
+ */
 export function SWITCH<T>(
 	headline: string | TemplateResult,
 	host: T,
@@ -114,8 +140,12 @@ export function SWITCH<T>(
 		required: false,
 		...options,
 	};
-	import('@material/web/list/list-item.js');
-	import('@material/web/switch/switch.js');
+	// if (!customElements.get('md-list-item')) {
+	// 	import('@material/web/list/list-item.js');
+	// }
+	// if (!customElements.get('md-switch')) {
+	// 	import('@material/web/switch/switch.js');
+	// }
 	return html`
 		<md-list-item
 			type="button"
@@ -123,7 +153,6 @@ export function SWITCH<T>(
 				(host[key] as boolean) = !host[key];
 			}}
 			class="select-none cursor-pointer flex items-center gap-3"
-			style="--md-list-item-top-space:var(--forms-switch-padding);--md-list-item-bottom-space:var(--forms-switch-padding);--md-list-item-leading-space:var(--forms-switch-padding);--md-list-item-trailing-space:var(--forms-switch-padding);"
 		>
 			${_options.checkbox
 				? html`
@@ -176,6 +205,9 @@ interface SliderOptions extends SharedOptions<Slider> {
 	persistLabel: boolean;
 }
 
+/**
+ * import '@material/web/slider/slider.js'
+ */
 export function SLIDER<T>(
 	label: string | TemplateResult,
 	host: T,
@@ -218,7 +250,9 @@ export function SLIDER<T>(
 		}
 	}
 
-	import('@material/web/slider/slider.js');
+	// if (!customElements.get('md-slider')) {
+	// 	import('@material/web/slider/slider.js');
+	// }
 
 	return html`
 		<div class="flex items-center gap-3 flex-1">
@@ -282,7 +316,7 @@ export const SELECT = <T>(
 
 interface ChipSelectOptions extends SharedOptions<Chip> {
 	/**
-	 * @default 'sort'
+	 * @default html`<md-icon>sort</md-icon>`
 	 */
 	leadingIcon: string | TemplateResult | undefined;
 }
@@ -293,6 +327,14 @@ interface ChipSelectOptions extends SharedOptions<Chip> {
 // 	}
 // `);
 
+/**
+ * import '@material/web/chips/chip-set.js'
+ * import '@material/web/chips/input-chip.js'
+ * import '@material/web/menu/menu.js'
+ * import '@material/web/menu/menu-item.js'
+ *
+ * <!-- <md-chip-set><md-input-chip><md-menu><md-menu-item> -->
+ */
 export function CHIPSELECT<T>(
 	label: string,
 	host: T,
@@ -310,24 +352,31 @@ export function CHIPSELECT<T>(
 	};
 
 	const menuRef = createRef<MdMenu>();
+	const menu = () => menuRef.value;
 	const chipRef = createRef<MdInputChip>();
 
-	import('@material/web/menu/menu.js');
-	import('@material/web/menu/menu-item.js');
-	import('@material/web/chips/chip-set.js');
-	import('@material/web/chips/input-chip.js');
+	// if (!customElements.get('md-menu')) {
+	// 	import('@material/web/menu/menu.js');
+	// }
+	//
+	// if (!customElements.get('md-menu-item')) {
+	// 	import('@material/web/menu/menu-item.js');
+	// }
+	// import('@material/web/chips/chip-set.js');
+	// import('@material/web/chips/input-chip.js');
+
+	const onClick = (event: Event) => {
+		event.preventDefault();
+		menu().open = !menu().open;
+	};
 
 	return html`
 		<md-chip-set class="relative">
 			<md-input-chip
 				id="chip"
 				${ref(chipRef)}
-				@remove=${(event: Event) => {
-					event.preventDefault();
-				}}
-				@click=${() => {
-					menuRef.value.open = !menuRef.value.open;
-				}}
+				@remove=${onClick}
+				@click=${onClick}
 				positioning="popover"
 			>
 				${_options.leadingIcon
@@ -338,13 +387,9 @@ export function CHIPSELECT<T>(
 							</div>`
 					: null}
 				<span>${host[key]}</span>
-				<md-icon
-					slot="remove-trailing-icon"
-					style="--md-icon-size:18px;"
-					class="pointer-events-none"
-					inert
-					>arrow_drop_down</md-icon
-				>
+				<md-icon slot="remove-trailing-icon" style="--md-icon-size:18px;">
+					arrow_drop_down
+				</md-icon>
 			</md-input-chip>
 
 			<md-menu
@@ -398,6 +443,11 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	leadingIcon: string | TemplateResult | undefined;
 }
 
+/**
+ * import '@material/web/textfield/filled-text-field.js';
+ * import '@material/web/textfield/outlined-text-field.js';
+ * import '@material/web/iconbutton/icon-button.js';
+ */
 export function TEXTFIELD<T>(
 	label: string,
 	host: T,
@@ -457,7 +507,9 @@ export function TEXTFIELD<T>(
 		});
 
 		if (_options.resetButton) {
-			import('@material/web/iconbutton/icon-button.js');
+			// if (!customElements.get('md-icon-button')) {
+			// 	import('@material/web/iconbutton/icon-button.js');
+			// }
 		}
 
 		const resetButtonOrNot = _options.resetButton
