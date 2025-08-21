@@ -73,7 +73,7 @@ export class FormBuilder<T> {
 	CHIPSELECT(
 		label: string,
 		key: keyof T,
-		choices: string[],
+		choices: readonly string[],
 		options?: Partial<ChipSelectOptions>,
 	) {
 		return CHIPSELECT(label, this.host, key, choices, options);
