@@ -377,7 +377,7 @@ export function CHIPSELECT<T>(
 				${ref(chipRef)}
 				@remove=${onClick}
 				@click=${onClick}
-				positioning="popover"
+				_positioning="popover"
 			>
 				${_options.leadingIcon
 					? typeof _options.leadingIcon === 'string'
@@ -393,6 +393,7 @@ export function CHIPSELECT<T>(
 			</md-input-chip>
 
 			<md-menu
+				quick
 				${ref(menuRef)}
 				anchor="chip"
 				@close-menu=${(event: CloseMenuEvent) => {
