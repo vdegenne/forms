@@ -150,9 +150,13 @@ export function SWITCH<T>(
 		<md-list-item
 			type="button"
 			@click=${() => {
+				if (_options.disabled) {
+					return;
+				}
 				(host[key] as boolean) = !host[key];
 			}}
 			class="select-none cursor-pointer flex items-center gap-3"
+			?disabled=${_options.disabled}
 		>
 			${_options.checkbox
 				? html`
