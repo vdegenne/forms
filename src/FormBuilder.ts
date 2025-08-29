@@ -156,10 +156,20 @@ export function SWITCH<T>(
 		>
 			${_options.checkbox
 				? html`
-						<md-checkbox slot="start" ?checked=${host[key]} inert></md-checkbox>
+						<md-checkbox
+							slot="start"
+							?checked=${host[key]}
+							inert
+							?disabled=${_options.disabled}
+						></md-checkbox>
 					`
 				: html`
-						<md-switch slot="start" ?selected=${host[key]} inert></md-switch>
+						<md-switch
+							slot="start"
+							?selected=${host[key]}
+							inert
+							?disabled=${_options.disabled}
+						></md-switch>
 					`}
 			${_options.overline
 				? html` <div slot="overline">${_options.overline}</div> `
