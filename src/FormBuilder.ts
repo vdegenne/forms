@@ -79,7 +79,7 @@ export class FormBuilder<T> {
 		return SLIDER(label, this.host, key, options);
 	}
 
-	SELECT(label: string, key: keyof T, choices: string[]) {
+	SELECT(label: string, key: keyof T, choices: readonly string[]) {
 		return SELECT(label, this.host, key, choices);
 	}
 
