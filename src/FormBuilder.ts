@@ -79,6 +79,10 @@ export class FormBuilder<T> {
 		return SLIDER(label, this.host, key, options);
 	}
 
+	/**
+	 * import '@material/web/select/filled-select.js'
+	 * import '@material/web/select/select-option.js'
+	 */
 	SELECT(label: string, key: keyof T, choices: readonly string[]) {
 		return SELECT(label, this.host, key, choices);
 	}
@@ -300,6 +304,10 @@ interface SelectOptions extends SharedOptions<Select> {
 	emptyValue: boolean;
 }
 
+/**
+ * import '@material/web/select/filled-select.js'
+ * import '@material/web/select/select-option.js'
+ */
 export function SELECT<T>(
 	label: string,
 	host: T,
@@ -323,7 +331,6 @@ export function SELECT<T>(
 					<md-select-option value=${id}>${item}</md-select-option>
 				`,
 			)}
-			<md-option></md-option>
 		</md-filled-select>
 	`;
 }
