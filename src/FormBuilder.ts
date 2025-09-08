@@ -22,14 +22,26 @@ import {
 } from 'lit/static-html.js';
 import {bindInput} from './bindInput.js';
 
-interface SharedOptions<T> {
+interface SharedOptions<T extends HTMLElement = HTMLElement> {
+	/** @default false */
 	autofocus: boolean;
+	/** @default undefined */
 	init: ((element: T) => void) | undefined;
+	/** @default false */
 	disabled: boolean;
-	styles?: string;
+	/** @default undefined */
+	styles: string | undefined;
 	/** @default false */
 	required: boolean;
 }
+
+const DEFAULT_SHARED_OPTIONS: SharedOptions = {
+	autofocus: false,
+	disabled: false,
+	init: undefined,
+	required: false,
+	styles: undefined,
+};
 
 type InputOptions = {
 	availableValues: string[];
@@ -83,8 +95,13 @@ export class FormBuilder<T> {
 	 * import '@material/web/select/filled-select.js'
 	 * import '@material/web/select/select-option.js'
 	 */
-	SELECT(label: string, key: keyof T, choices: readonly string[]) {
-		return SELECT(label, this.host, key, choices);
+	SELECT(
+		label: string,
+		key: keyof T,
+		choices: readonly string[],
+		options?: Partial<SelectOptions>,
+	) {
+		return SELECT(label, this.host, key, choices, options);
 	}
 
 	/**
@@ -115,12 +132,12 @@ export class FormBuilder<T> {
 }
 
 interface SwitchOptions extends SharedOptions<Switch> {
-	overline: string | undefined;
-	supportingText: string | undefined;
 	/**
 	 * @default false
 	 */
 	checkbox: boolean;
+	overline: string | undefined;
+	supportingText: string | undefined;
 }
 
 /**
@@ -135,14 +152,11 @@ export function SWITCH<T>(
 	options?: Partial<SwitchOptions>,
 ) {
 	const _options: SwitchOptions = {
-		autofocus: false,
-		init: undefined,
-		supportingText: undefined,
-		overline: undefined,
+		...DEFAULT_SHARED_OPTIONS,
 		checkbox: false,
-		disabled: false,
-		required: false,
-		...options,
+		overline: undefined,
+		supportingText: undefined,
+		...(options ?? {}),
 	};
 	// if (!customElements.get('md-list-item')) {
 	// 	import('@material/web/list/list-item.js');
@@ -233,8 +247,7 @@ export function SLIDER<T>(
 	options?: Partial<SliderOptions>,
 ) {
 	const _options: SliderOptions = {
-		autofocus: false,
-		init: undefined,
+		...DEFAULT_SHARED_OPTIONS,
 		min: 0,
 		max: 10,
 		step: 1,
@@ -243,8 +256,6 @@ export function SLIDER<T>(
 		timeoutMs: 0,
 		ticks: false,
 		persistLabel: false,
-		disabled: false,
-		required: false,
 		...options,
 	};
 
@@ -298,10 +309,12 @@ export function SLIDER<T>(
 }
 
 interface SelectOptions extends SharedOptions<Select> {
-	/**
-	 * Wether or not to include an empty value as first value.
-	 */
-	emptyValue: boolean;
+	// /**
+	//  * Wether or not to include an empty value as first value.
+	//  */
+	// emptyValue: boolean;
+
+	supportingText: string | undefined;
 }
 
 /**
@@ -313,7 +326,13 @@ export function SELECT<T>(
 	host: T,
 	key: keyof T,
 	choices: readonly string[] = [],
+	options?: Partial<SelectOptions>,
 ) {
+	const _options: SelectOptions = {
+		...DEFAULT_SHARED_OPTIONS,
+		supportingText: undefined,
+		...(options ?? {}),
+	};
 	const _select = createRef<MdFilledSelect>();
 	return html`
 		<md-filled-select
@@ -321,10 +340,11 @@ export function SELECT<T>(
 			quick
 			value=${choices.indexOf(host[key] as string)}
 			label=${label}
-			@change=${() => {
+			@change="${() => {
 				const index = _select.value.selectedIndex;
 				(host[key] as string) = choices[index];
-			}}
+			}}"
+			supporting-text=${ifDefined(_options.supportingText)}
 		>
 			${choices.map(
 				(item, id) => html`
@@ -364,11 +384,8 @@ export function CHIPSELECT<T>(
 	options?: Partial<ChipSelectOptions>,
 ) {
 	const _options: ChipSelectOptions = {
-		autofocus: false,
-		init: undefined,
+		...DEFAULT_SHARED_OPTIONS,
 		leadingIcon: html`<md-icon>sort</md-icon>`,
-		disabled: false,
-		required: false,
 		...(options ?? {}),
 	};
 
@@ -477,17 +494,14 @@ export function TEXTFIELD<T>(
 	options?: Partial<TextFieldOptions>,
 ) {
 	const _options: TextFieldOptions = {
-		autofocus: false,
-		init: undefined,
+		...DEFAULT_SHARED_OPTIONS,
 		type: 'text',
 		suffixText: undefined,
 		style: 'outlined',
 		rows: 2,
 		resetButton: undefined,
 		onInput: undefined,
-		disabled: false,
 		leadingIcon: undefined,
-		required: false,
 		...(options ?? {}),
 	};
 	const promisesToWait = [];
@@ -637,14 +651,11 @@ export const FILTER = <T>(
 	options?: Partial<FilterOptions>,
 ) => {
 	const _options: FilterOptions = {
-		autofocus: false,
-		init: undefined,
+		...DEFAULT_SHARED_OPTIONS,
 		behavior: FilterBehavior.ZeroOrMore,
-		sort: 'none',
 		type: 'string',
+		sort: 'none',
 		elevated: false,
-		disabled: false,
-		required: false,
 		...(options ?? {}),
 	};
 	const _choices = choices
@@ -767,13 +778,9 @@ export function TOGGLEBUTTON<T>(
 ) {
 	const icon = options?.icon ?? 'close';
 	const _options: ToggleButtonOptions = {
+		...DEFAULT_SHARED_OPTIONS,
 		icon,
 		selectedIcon: icon === 'close' && !options?.selectedIcon ? 'check' : icon,
-		// Shared
-		disabled: false,
-		autofocus: false,
-		required: true,
-		init: undefined,
 		...(options ?? {}),
 	};
 	return html`
