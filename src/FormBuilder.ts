@@ -300,12 +300,12 @@ interface SelectOptions extends SharedOptions<Select> {
 	emptyValue: boolean;
 }
 
-export const SELECT = <T>(
+export function SELECT<T>(
 	label: string,
 	host: T,
 	key: keyof T,
-	choices: string[] = [],
-) => {
+	choices: readonly string[] = [],
+) {
 	const _select = createRef<MdFilledSelect>();
 	return html`
 		<md-filled-select
@@ -326,7 +326,7 @@ export const SELECT = <T>(
 			<md-option></md-option>
 		</md-filled-select>
 	`;
-};
+}
 
 interface ChipSelectOptions extends SharedOptions<Chip> {
 	/**
