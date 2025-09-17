@@ -302,6 +302,7 @@ export function SLIDER<T>(
 				step=${_options.step}
 				@input=${eventCallBack}
 				@change=${eventCallBack}
+				style=${ifDefined(_options.styles)}
 			>
 			</md-slider>
 		</div>
