@@ -230,6 +230,11 @@ interface SliderOptions extends SharedOptions<Slider> {
 	ticks: boolean;
 
 	/**
+	 * @default true
+	 */
+	labeled: boolean;
+
+	/**
 	 * Should persist the label or not.
 	 *
 	 * @default false
@@ -256,6 +261,7 @@ export function SLIDER<T>(
 		timeoutMs: 0,
 		ticks: false,
 		persistLabel: false,
+		labeled: true,
 		...options,
 	};
 
@@ -292,7 +298,7 @@ export function SLIDER<T>(
 				?persist-label=${_options.persistLabel}
 				class="flex-1"
 				?ticks=${_options.ticks}
-				labeled
+				?labeled=${_options.labeled}
 				min=${_options.min}
 				max=${_options.max}
 				?range=${_options.range}
