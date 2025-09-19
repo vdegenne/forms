@@ -175,7 +175,7 @@ export function SWITCH<T>(
 			}}
 			class="select-none cursor-pointer flex items-center gap-3"
 			?disabled=${_options.disabled}
-			styles=${ifDefined(_options.styles)}
+			style=${ifDefined(_options.styles)}
 		>
 			${_options.checkbox
 				? html`
