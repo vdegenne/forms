@@ -59,6 +59,11 @@ export class FormBuilder<T> {
 		return TEXTFIELD(label, this.host, key, options);
 	}
 
+	/**
+	 * import '@material/web/textfield/filled-text-field.js';
+	 * import '@material/web/textfield/outlined-text-field.js';
+	 * import '@material/web/iconbutton/icon-button.js';
+	 */
 	TEXTAREA(label: string, key: keyof T, options?: Partial<TextFieldOptions>) {
 		return TEXTAREA(label, this.host, key, options);
 	}
@@ -78,6 +83,17 @@ export class FormBuilder<T> {
 		options?: Partial<SwitchOptions>,
 	) {
 		return SWITCH(headline, this.host, key, options);
+	}
+
+	/**
+	 * import '@material/web/checkbox/checkbox.js';
+	 */
+	CHECKBOX(
+		headline: string | TemplateResult,
+		key: keyof T,
+		options?: Partial<CheckboxOptions>,
+	) {
+		return CHECKBOX(headline, this.host, key, options);
 	}
 
 	/**
@@ -203,6 +219,38 @@ export function SWITCH<T>(
 				: null}
 		</md-list-item>
 	`;
+}
+
+interface CheckboxOptions extends SharedOptions {}
+
+/**
+ * import '@material/web/checkbox/checkbox.js';
+ */
+export function CHECKBOX<T>(
+	headline: string | TemplateResult,
+	host: T,
+	key: keyof T,
+	options?: Partial<CheckboxOptions>,
+) {
+	const _options: CheckboxOptions = {
+		...DEFAULT_SHARED_OPTIONS,
+		...options,
+	};
+
+	return html`<!-- -->
+		<label class="flex gap-3 cursor-pointer select-none">
+			<md-checkbox
+				?checked=${host[key]}
+				inert
+				?disabled=${_options.disabled}
+				@input=${(event: Event) => {
+					const checkbox = event.target as HTMLInputElement;
+					(<boolean>host[key]) = checkbox.checked;
+				}}
+			></md-checkbox>
+			<span>${headline}</span>
+		</label>
+		<!-- -->`;
 }
 
 interface SliderOptions extends SharedOptions<Slider> {
@@ -488,6 +536,8 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	onInput: ((params: OnInputParameters) => OnInputReturnType) | undefined;
 
 	leadingIcon: string | TemplateResult | undefined;
+
+	supportingText: string | undefined;
 }
 
 /**
@@ -510,7 +560,8 @@ export function TEXTFIELD<T>(
 		resetButton: undefined,
 		onInput: undefined,
 		leadingIcon: undefined,
-		...(options ?? {}),
+		supportingText: undefined,
+		...options,
 	};
 	const promisesToWait = [];
 	let style: StaticValue;
@@ -588,8 +639,9 @@ export function TEXTFIELD<T>(
 			.rows=${_options.rows}
 			?required=${_options.required || label.includes('*')}
 			suffix-text=${ifDefined(_options.suffixText)}
-			${bindInput(host, key)}
+			supporting-text=${ifDefined(_options.supportingText)}
 			style=${ifDefined(_options.styles)}
+			${bindInput(host, key)}
 		>
 		${
 			_options.leadingIcon
@@ -613,6 +665,11 @@ export function TEXTFIELD<T>(
 	return render();
 }
 
+/**
+ * import '@material/web/textfield/filled-text-field.js';
+ * import '@material/web/textfield/outlined-text-field.js';
+ * import '@material/web/iconbutton/icon-button.js';
+ */
 export const TEXTAREA = <T>(
 	label: string,
 	host: T,
