@@ -1,6 +1,6 @@
 {
 	"name": "@vdegenne/forms",
-	"version": "0.1.50",
+	"version": "0.1.51",
 	"type": "module",
 	"scripts": {
 		"build": "wireit"
@@ -39,11 +39,11 @@
 			"import": "./lib/index.js",
 			"types": "./lib/index.d.ts"
 		},
-		"./FormBuilder": {
+		"./FormBuilder.js": {
 			"import": "./lib/FormBuilder.js",
 			"types": "./lib/FormBuilder.d.ts"
 		},
-		"./bindInput": {
+		"./bindInput.js": {
 			"import": "./lib/bindInput.js",
 			"types": "./lib/bindInput.d.ts"
 		}

@@ -159,7 +159,6 @@ interface SwitchOptions extends SharedOptions<Switch> {
 /**
  * import '@material/web/list/list-item.js';
  * import '@material/web/switch/switch.js';
- * import '@material/web/checkbox/checkbox.js';
  */
 export function SWITCH<T>(
 	headline: string | TemplateResult,
@@ -189,7 +188,9 @@ export function SWITCH<T>(
 				}
 				(host[key] as boolean) = !host[key];
 			}}
-			class="select-none cursor-pointer flex items-center gap-3"
+			class="select-none ${_options.disabled
+				? 'initial'
+				: 'cursor-pointer'} flex items-center gap-3"
 			?disabled=${_options.disabled}
 			style=${ifDefined(_options.styles)}
 		>
@@ -221,36 +222,25 @@ export function SWITCH<T>(
 	`;
 }
 
-interface CheckboxOptions extends SharedOptions {}
+interface CheckboxOptions extends SwitchOptions {}
 
 /**
+ * import '@material/web/list/list-item.js';
  * import '@material/web/checkbox/checkbox.js';
  */
 export function CHECKBOX<T>(
 	headline: string | TemplateResult,
 	host: T,
 	key: keyof T,
-	options?: Partial<CheckboxOptions>,
+	options?: Partial<SwitchOptions>,
 ) {
-	const _options: CheckboxOptions = {
-		...DEFAULT_SHARED_OPTIONS,
-		...options,
-	};
+	// const _options: SwitchOptions = {
+	// 	...DEFAULT_SHARED_OPTIONS,
+	// 	checkbox: true,
+	// 	...options,
+	// };
 
-	return html`<!-- -->
-		<label class="flex gap-3 cursor-pointer select-none">
-			<md-checkbox
-				?checked=${host[key]}
-				inert
-				?disabled=${_options.disabled}
-				@input=${(event: Event) => {
-					const checkbox = event.target as HTMLInputElement;
-					(<boolean>host[key]) = checkbox.checked;
-				}}
-			></md-checkbox>
-			<span>${headline}</span>
-		</label>
-		<!-- -->`;
+	return SWITCH(headline, host, key, {...options, checkbox: true});
 }
 
 interface SliderOptions extends SharedOptions<Slider> {
@@ -530,7 +520,10 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	 * @default undefined
 	 */
 	resetButton:
-		| {icon?: string | TemplateResult; callback?: () => void}
+		| {
+				icon?: string | TemplateResult;
+				callback?: (textfield: TextField) => void;
+		  }
 		| undefined;
 
 	onInput: ((params: OnInputParameters) => OnInputReturnType) | undefined;
@@ -538,6 +531,8 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	leadingIcon: string | TemplateResult | undefined;
 
 	supportingText: string | undefined;
+
+	placeholder: string | undefined;
 }
 
 /**
@@ -561,6 +556,7 @@ export function TEXTFIELD<T>(
 		onInput: undefined,
 		leadingIcon: undefined,
 		supportingText: undefined,
+		placeholder: undefined,
 		...options,
 	};
 	const promisesToWait = [];
@@ -613,14 +609,14 @@ export function TEXTFIELD<T>(
 					form=""
 					@click=${() => {
 						if (_options.resetButton.callback) {
-							_options.resetButton.callback();
+							_options.resetButton.callback(textfield());
 						} else {
 							(<string>host[key]) = '';
 							textfield().focus();
 						}
 					}}
 				>
-					${_options.resetButton
+					${_options.resetButton.icon
 						? typeof _options.resetButton.icon === 'string'
 							? html`<md-icon>${_options.resetButton.icon}</md-icon>`
 							: _options.resetButton.icon
@@ -642,6 +638,7 @@ export function TEXTFIELD<T>(
 			supporting-text=${ifDefined(_options.supportingText)}
 			style=${ifDefined(_options.styles)}
 			${bindInput(host, key)}
+			placeholder=${ifDefined(_options.placeholder)}
 		>
 		${
 			_options.leadingIcon
