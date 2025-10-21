@@ -1,3 +1,4 @@
+import {type MdCheckbox} from '@material/web/checkbox/checkbox.js';
 import {type MdChipSet} from '@material/web/chips/chip-set.js';
 import {type MdFilterChip} from '@material/web/chips/filter-chip.js';
 import {type MdInputChip} from '@material/web/chips/input-chip.js';
@@ -9,7 +10,7 @@ import {type MdFilledSelect} from '@material/web/select/filled-select.js';
 import {type Select} from '@material/web/select/internal/select.js';
 import {type Slider} from '@material/web/slider/internal/slider.js';
 import {type MdSlider} from '@material/web/slider/slider.js';
-import {type Switch} from '@material/web/switch/internal/switch.js';
+import {type MdSwitch} from '@material/web/switch/switch.js';
 import {type TextField} from '@material/web/textfield/internal/text-field.js';
 import {Debouncer} from '@vdegenne/debouncer';
 import {html, type TemplateResult} from 'lit';
@@ -21,6 +22,7 @@ import {
 	type StaticValue,
 } from 'lit/static-html.js';
 import {bindInput} from './bindInput.js';
+import {styleMap, type StyleInfo} from 'lit/directives/style-map.js';
 
 interface SharedOptions<T extends HTMLElement = HTMLElement> {
 	/** @default false */
@@ -29,8 +31,13 @@ interface SharedOptions<T extends HTMLElement = HTMLElement> {
 	init: ((element: T) => void) | undefined;
 	/** @default false */
 	disabled: boolean;
-	/** @default undefined */
+	/**
+	 * @default undefined
+	 * @deprecated Use "style" instead.
+	 */
 	styles: string | undefined;
+	/** @default undefined */
+	style: Readonly<StyleInfo> | undefined;
 	/** @default false */
 	required: boolean;
 }
@@ -40,6 +47,7 @@ const DEFAULT_SHARED_OPTIONS: SharedOptions = {
 	disabled: false,
 	init: undefined,
 	required: false,
+	style: undefined,
 	styles: undefined,
 };
 
@@ -147,13 +155,21 @@ export class FormBuilder<T> {
 	}
 }
 
-interface SwitchOptions extends SharedOptions<Switch> {
-	/**
-	 * @default false
-	 */
+interface SwitchOptions extends SharedOptions<MdSwitch> {
+	/** @default 'text' */
+	type: 'text' | 'button';
+	/** @default false*/
 	checkbox: boolean;
 	overline: string | undefined;
 	supportingText: string | undefined;
+	/** @default 'leading' */
+	position: 'leading' | 'trailing';
+	/**
+	 * When position is set to "trailing"
+	 * you can provite a leading content (e.g. an icon)
+	 */
+	leadingContent: string | TemplateResult | undefined;
+	trailingSupportingText: string | TemplateResult | undefined;
 }
 
 /**
@@ -168,55 +184,88 @@ export function SWITCH<T>(
 ) {
 	const _options: SwitchOptions = {
 		...DEFAULT_SHARED_OPTIONS,
+		type: 'text',
 		checkbox: false,
 		overline: undefined,
 		supportingText: undefined,
-		...(options ?? {}),
+		position: 'leading',
+		leadingContent: undefined,
+		trailingSupportingText: undefined,
+		...options,
 	};
-	// if (!customElements.get('md-list-item')) {
-	// 	import('@material/web/list/list-item.js');
-	// }
-	// if (!customElements.get('md-switch')) {
-	// 	import('@material/web/switch/switch.js');
-	// }
+	_options.style = {
+		'user-select': 'none',
+		cursor:
+			_options.disabled || _options.type === 'text' ? 'initial' : 'pointer',
+		..._options.style,
+	};
+	if (!customElements.get('md-list-item')) {
+		import('@material/web/list/list-item.js');
+	}
+	if (!customElements.get('md-switch')) {
+		import('@material/web/switch/switch.js');
+	}
 	return html`
 		<md-list-item
-			type="button"
+			type="${_options.type}"
 			@click=${() => {
 				if (_options.disabled) {
 					return;
 				}
-				(host[key] as boolean) = !host[key];
+				if (_options.type === 'button') {
+					(host[key] as boolean) = !host[key];
+				}
 			}}
-			class="select-none ${_options.disabled
-				? 'initial'
-				: 'cursor-pointer'} flex items-center gap-3"
+			@change=${(event: Event) => {
+				if (_options.type === 'text') {
+					const target = event.target as HTMLElement;
+					if (_options.checkbox && target.nodeName === 'MD-CHECKBOX') {
+						const checkbox = target as MdCheckbox;
+						checkbox.updateComplete.then(
+							() => ((host[key] as boolean) = checkbox.checked),
+						);
+					} else if (!_options.checkbox && target.nodeName === 'MD-SWITCH') {
+						const switch_ = target as MdSwitch;
+						switch_.updateComplete.then(
+							() => ((host[key] as boolean) = switch_.selected),
+						);
+					}
+				}
+			}}
 			?disabled=${_options.disabled}
-			style=${ifDefined(_options.styles)}
+			style=${ifDefined(_options.style ? styleMap(_options.style) : undefined)}
 		>
+			${_options.position === 'trailing' && _options.leadingContent
+				? html`<div slot="start">${_options.leadingContent}</div>`
+				: null}
 			${_options.checkbox
 				? html`
 						<md-checkbox
-							slot="start"
+							slot="${_options.position === 'leading' ? 'start' : 'end'}"
 							?checked=${host[key]}
-							inert
+							?inert=${_options.type === 'button'}
 							?disabled=${_options.disabled}
 						></md-checkbox>
 					`
 				: html`
 						<md-switch
-							slot="start"
+							slot="${_options.position === 'leading' ? 'start' : 'end'}"
 							?selected=${host[key]}
-							inert
+							?inert=${_options.type === 'button'}
 							?disabled=${_options.disabled}
 						></md-switch>
 					`}
 			${_options.overline
-				? html` <div slot="overline">${_options.overline}</div> `
+				? html`<div slot="overline">${_options.overline}</div>`
 				: null}
 			<div slot="headline">${headline}</div>
 			${_options.supportingText
-				? html` <div slot="supporting-text">${_options.supportingText}</div> `
+				? html`<div slot="supporting-text">${_options.supportingText}</div>`
+				: null}
+			${_options.trailingSupportingText
+				? html`<div slot="trailing-supporting-text">
+						${_options.trailingSupportingText}
+					</div>`
 				: null}
 		</md-list-item>
 	`;
@@ -509,7 +558,7 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	type: 'text' | 'number' | 'textarea' | 'date';
 	suffixText: string | undefined;
 	/** @default 'outlined' */
-	style: 'filled' | 'outlined';
+	variant: 'filled' | 'outlined';
 	/**
 	 * Number of rows when the type is "textarea"
 	 * @default 2
@@ -550,7 +599,7 @@ export function TEXTFIELD<T>(
 		...DEFAULT_SHARED_OPTIONS,
 		type: 'text',
 		suffixText: undefined,
-		style: 'outlined',
+		variant: 'outlined',
 		rows: 2,
 		resetButton: undefined,
 		onInput: undefined,
@@ -561,7 +610,7 @@ export function TEXTFIELD<T>(
 	};
 	const promisesToWait = [];
 	let style: StaticValue;
-	switch (_options.style) {
+	switch (_options.variant) {
 		case 'filled':
 			// promisesToWait.push(
 			// 	import('@material/web/textfield/filled-text-field.js'),
