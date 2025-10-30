@@ -568,7 +568,7 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	rows: number;
 
 	/**
-	 * @default undefined
+	 * @default true
 	 */
 	resetButton:
 		| {
@@ -604,7 +604,7 @@ export function TEXTFIELD<T>(
 		suffixText: undefined,
 		variant: 'outlined',
 		rows: 2,
-		resetButton: undefined,
+		resetButton: true,
 		onInput: undefined,
 		leadingIcon: undefined,
 		supportingText: undefined,
@@ -676,7 +676,13 @@ export function TEXTFIELD<T>(
 						? typeof _options.resetButton.icon === 'string'
 							? html`<md-icon>${_options.resetButton.icon}</md-icon>`
 							: _options.resetButton.icon
-						: html`<md-icon>clear</md-icon>`}
+						: html`
+								<svg viewBox="0 96 960 960">
+									<path
+										d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"
+									/>
+								</svg>
+							`}
 				</md-icon-button>`
 			: null;
 
