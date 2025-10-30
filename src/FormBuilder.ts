@@ -575,6 +575,7 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 				icon?: string | TemplateResult;
 				callback?: (textfield: TextField) => void;
 		  }
+		| boolean
 		| undefined;
 
 	onInput: ((params: OnInputParameters) => OnInputReturnType) | undefined;
@@ -649,9 +650,9 @@ export function TEXTFIELD<T>(
 		});
 
 		if (_options.resetButton) {
-			// if (!customElements.get('md-icon-button')) {
-			// 	import('@material/web/iconbutton/icon-button.js');
-			// }
+			if (!customElements.get('md-icon-button')) {
+				import('@material/web/iconbutton/icon-button.js');
+			}
 		}
 
 		const resetButtonOrNot = _options.resetButton
@@ -659,7 +660,10 @@ export function TEXTFIELD<T>(
 					slot="trailing-icon"
 					form=""
 					@click=${() => {
-						if (_options.resetButton.callback) {
+						if (
+							typeof _options.resetButton === 'object' &&
+							_options.resetButton.callback
+						) {
 							_options.resetButton.callback(textfield());
 						} else {
 							(<string>host[key]) = '';
@@ -667,7 +671,8 @@ export function TEXTFIELD<T>(
 						}
 					}}
 				>
-					${_options.resetButton.icon
+					${typeof _options.resetButton === 'object' &&
+					_options.resetButton.icon
 						? typeof _options.resetButton.icon === 'string'
 							? html`<md-icon>${_options.resetButton.icon}</md-icon>`
 							: _options.resetButton.icon
