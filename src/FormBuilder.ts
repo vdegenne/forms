@@ -373,9 +373,9 @@ export function SLIDER<T>(
 		}
 	}
 
-	// if (!customElements.get('md-slider')) {
-	// 	import('@material/web/slider/slider.js');
-	// }
+	if (!customElements.get('md-slider')) {
+		import('@material/web/slider/slider.js');
+	}
 
 	return html`
 		<div class="flex items-center gap-3 flex-1">
@@ -396,7 +396,9 @@ export function SLIDER<T>(
 				step=${_options.step}
 				@input=${eventCallBack}
 				@change=${eventCallBack}
-				style=${ifDefined(_options.styles)}
+				style=${ifDefined(
+					_options.style ? styleMap(_options.style) : undefined,
+				)}
 			>
 			</md-slider>
 		</div>
