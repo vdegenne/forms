@@ -698,7 +698,7 @@ export function TEXTFIELD<T>(
 			?required=${_options.required || label.includes('*')}
 			suffix-text=${ifDefined(_options.suffixText)}
 			supporting-text=${ifDefined(_options.supportingText)}
-			style=${ifDefined(_options.styles)}
+			style=${ifDefined(_options.style ? styleMap(_options.style) : undefined)}
 			${bindInput(host, key)}
 			placeholder=${ifDefined(_options.placeholder)}
 		>
