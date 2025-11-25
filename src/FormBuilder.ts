@@ -615,16 +615,16 @@ export function TEXTFIELD<T>(
 	let style: StaticValue;
 	switch (_options.variant) {
 		case 'filled':
-			promisesToWait.push(
-				import('@material/web/textfield/filled-text-field.js'),
-			);
+			// promisesToWait.push(
+			// 	import('@material/web/textfield/filled-text-field.js'),
+			// );
 			style = literal`filled`;
 			break;
 
 		case 'outlined':
-			promisesToWait.push(
-				import('@material/web/textfield/outlined-text-field.js'),
-			);
+			// promisesToWait.push(
+			// 	import('@material/web/textfield/outlined-text-field.js'),
+			// );
 			style = literal`outlined`;
 			break;
 	}
