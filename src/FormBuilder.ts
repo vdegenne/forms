@@ -442,6 +442,9 @@ export function SELECT<T>(
 				(host[key] as string) = choices[index];
 			}}"
 			supporting-text=${ifDefined(_options.supportingText)}
+			style="${ifDefined(
+				_options.style ? styleMap(_options.style) : undefined,
+			)}"
 		>
 			${choices.map(
 				(item, id) => html`
