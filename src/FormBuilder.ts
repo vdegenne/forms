@@ -434,6 +434,7 @@ export function SELECT<T>(
 	return html`
 		<md-filled-select
 			${ref(_select)}
+			?disabled=${_options.disabled}
 			quick
 			value=${choices.indexOf(host[key] as string)}
 			label=${label}
