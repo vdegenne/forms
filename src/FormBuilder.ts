@@ -406,10 +406,7 @@ export function SLIDER<T>(
 }
 
 interface SelectOptions extends SharedOptions<Select> {
-	// /**
-	//  * Wether or not to include an empty value as first value.
-	//  */
-	// emptyValue: boolean;
+	menuPositioning: 'popover' | 'fixed' | 'absolute';
 
 	supportingText: string | undefined;
 }
@@ -427,6 +424,7 @@ export function SELECT<T>(
 ) {
 	const _options: SelectOptions = {
 		...DEFAULT_SHARED_OPTIONS,
+		menuPositioning: 'absolute',
 		supportingText: undefined,
 		...(options ?? {}),
 	};
@@ -436,6 +434,7 @@ export function SELECT<T>(
 			${ref(_select)}
 			?disabled=${_options.disabled}
 			quick
+			menu-positioning=${_options.menuPositioning}
 			value=${choices.indexOf(host[key] as string)}
 			label=${label}
 			@change="${() => {
