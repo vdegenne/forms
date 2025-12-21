@@ -145,6 +145,10 @@ export class FormBuilder<T> {
 		return CHIPSELECT(label, this.host, key, choices, options);
 	}
 
+	/**
+	 * import '@material/web/chips/chip-set.js'
+	 * import '@material/web/chips/filter-chip.js'
+	 */
 	FILTER(
 		label: string,
 		key: keyof T,
@@ -766,10 +770,19 @@ interface FilterOptions extends SharedOptions<Chip> {
 	/**
 	 * @default false
 	 */
+	reverseSort: boolean;
+
+	/**
+	 * @default false
+	 */
 	elevated: boolean;
 }
 type StringOrNumber = string | number;
 
+/**
+ * import '@material/web/chips/chip-set.js'
+ * import '@material/web/chips/filter-chip.js'
+ */
 export const FILTER = <T>(
 	label: string,
 	host: T,
@@ -782,6 +795,7 @@ export const FILTER = <T>(
 		behavior: FilterBehavior.ZeroOrMore,
 		type: 'string',
 		sort: 'none',
+		reverseSort: false,
 		elevated: false,
 		...(options ?? {}),
 	};
@@ -795,6 +809,9 @@ export const FILTER = <T>(
 					return 0;
 			}
 		});
+	if (options.reverseSort) {
+		_choices.reverse();
+	}
 
 	const chipsetref: Ref<MdChipSet> = createRef();
 
