@@ -575,7 +575,7 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	rows: number;
 
 	/**
-	 * @default true
+	 * @default false
 	 */
 	resetButton:
 		| {
@@ -611,7 +611,7 @@ export function TEXTFIELD<T>(
 		suffixText: undefined,
 		variant: 'filled',
 		rows: 2,
-		resetButton: true,
+		resetButton: false,
 		onInput: undefined,
 		leadingIcon: undefined,
 		supportingText: undefined,
@@ -736,12 +736,14 @@ export function TEXTFIELD<T>(
  * import '@material/web/textfield/outlined-text-field.js';
  * import '@material/web/iconbutton/icon-button.js';
  */
-export const TEXTAREA = <T>(
+function TEXTAREA<T>(
 	label: string,
 	host: T,
 	key: keyof T,
 	options?: Partial<TextFieldOptions>,
-) => TEXTFIELD(label, host, key, {...options, type: 'textarea'});
+) {
+	return TEXTFIELD(label, host, key, {...options, type: 'textarea'});
+}
 
 export const FilterBehavior = {
 	ZeroOrMore: 'zero-or-more',
