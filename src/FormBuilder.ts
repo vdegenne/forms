@@ -160,7 +160,7 @@ export class FormBuilder<T> {
 }
 
 interface SwitchOptions extends SharedOptions<MdSwitch> {
-	/** @default 'text' */
+	/** @default 'button' */
 	type: 'text' | 'button';
 	/** @default false*/
 	checkbox: boolean;
@@ -188,7 +188,7 @@ export function SWITCH<T>(
 ) {
 	const _options: SwitchOptions = {
 		...DEFAULT_SHARED_OPTIONS,
-		type: 'text',
+		type: 'button',
 		checkbox: false,
 		overline: undefined,
 		supportingText: undefined,
