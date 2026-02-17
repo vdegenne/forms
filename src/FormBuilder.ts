@@ -13,7 +13,7 @@ import {type MdSlider} from '@material/web/slider/slider.js';
 import {type MdSwitch} from '@material/web/switch/switch.js';
 import {type TextField} from '@material/web/textfield/internal/text-field.js';
 import {Debouncer} from '@vdegenne/debouncer';
-import {html, type TemplateResult} from 'lit';
+import {html, nothing, type TemplateResult} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
 import {createRef, type Ref, ref} from 'lit/directives/ref.js';
 import {
@@ -592,6 +592,11 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	supportingText: string | undefined;
 
 	placeholder: string | undefined;
+
+	/**
+	 * Constrain input max length
+	 */
+	maxLength: number | undefined;
 }
 
 /**
@@ -616,6 +621,7 @@ export function TEXTFIELD<T>(
 		leadingIcon: undefined,
 		supportingText: undefined,
 		placeholder: undefined,
+		maxLength: undefined,
 		...options,
 	};
 	const promisesToWait = [];
@@ -708,6 +714,7 @@ export function TEXTFIELD<T>(
 			style=${ifDefined(_options.style ? styleMap(_options.style) : undefined)}
 			${bindInput(host, key)}
 			placeholder=${ifDefined(_options.placeholder)}
+			maxlength=${_options.maxLength ?? nothing}
 		>
 		${
 			_options.leadingIcon
