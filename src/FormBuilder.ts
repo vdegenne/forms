@@ -564,7 +564,15 @@ type OnInputReturnType = {errorText?: string; supportingText?: string};
 
 interface TextFieldOptions extends SharedOptions<TextField> {
 	// TODO: find a generic type for input type
-	type: 'text' | 'number' | 'textarea' | 'date' | 'time' | 'url' | 'email';
+	type:
+		| 'text'
+		| 'number'
+		| 'textarea'
+		| 'date'
+		| 'time'
+		| 'datetime-local'
+		| 'url'
+		| 'email';
 	suffixText: string | undefined;
 	/** @default 'outlined' */
 	variant: 'filled' | 'outlined';

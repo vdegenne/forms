@@ -167,6 +167,7 @@ class BindInputDirective extends AsyncDirective {
 				case 'number':
 				case 'date':
 				case 'time':
+				case 'datetime-local':
 					element.valueAsNumber = value as number;
 					break;
 				case 'textarea':
