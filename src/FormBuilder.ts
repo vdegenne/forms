@@ -751,7 +751,7 @@ export function TEXTFIELD<T>(
  * import '@material/web/textfield/outlined-text-field.js';
  * import '@material/web/iconbutton/icon-button.js';
  */
-function TEXTAREA<T>(
+export function TEXTAREA<T>(
 	label: string,
 	host: T,
 	key: keyof T,
