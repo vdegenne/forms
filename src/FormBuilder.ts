@@ -15,14 +15,14 @@ import {type TextField} from '@material/web/textfield/internal/text-field.js';
 import {Debouncer} from '@vdegenne/debouncer';
 import {html, nothing, type TemplateResult} from 'lit';
 import {ifDefined} from 'lit/directives/if-defined.js';
-import {createRef, type Ref, ref} from 'lit/directives/ref.js';
+import {createRef, ref, type Ref} from 'lit/directives/ref.js';
+import {styleMap, type StyleInfo} from 'lit/directives/style-map.js';
 import {
 	literal,
 	html as staticHtml,
 	type StaticValue,
 } from 'lit/static-html.js';
 import {bindInput} from './bindInput.js';
-import {styleMap, type StyleInfo} from 'lit/directives/style-map.js';
 
 interface SharedOptions<T extends HTMLElement = HTMLElement> {
 	/** @default false */
@@ -239,38 +239,48 @@ export function SWITCH<T>(
 			?disabled=${_options.disabled}
 			style=${ifDefined(_options.style ? styleMap(_options.style) : undefined)}
 		>
-			${_options.position === 'trailing' && _options.leadingContent
-				? html`<div slot="start">${_options.leadingContent}</div>`
-				: null}
-			${_options.checkbox
-				? html`
-						<md-checkbox
-							slot="${_options.position === 'leading' ? 'start' : 'end'}"
-							?checked=${host[key]}
-							?inert=${_options.type === 'button'}
-							?disabled=${_options.disabled}
-						></md-checkbox>
-					`
-				: html`
-						<md-switch
-							slot="${_options.position === 'leading' ? 'start' : 'end'}"
-							?selected=${host[key]}
-							?inert=${_options.type === 'button'}
-							?disabled=${_options.disabled}
-						></md-switch>
-					`}
-			${_options.overline
-				? html`<div slot="overline">${_options.overline}</div>`
-				: null}
+			${
+				_options.position === 'trailing' && _options.leadingContent
+					? html`<div slot="start">${_options.leadingContent}</div>`
+					: null
+			}
+			${
+				_options.checkbox
+					? html`
+							<md-checkbox
+								slot="${_options.position === 'leading' ? 'start' : 'end'}"
+								?checked=${host[key]}
+								?inert=${_options.type === 'button'}
+								?disabled=${_options.disabled}
+							></md-checkbox>
+						`
+					: html`
+							<md-switch
+								slot="${_options.position === 'leading' ? 'start' : 'end'}"
+								?selected=${host[key]}
+								?inert=${_options.type === 'button'}
+								?disabled=${_options.disabled}
+							></md-switch>
+						`
+			}
+			${
+				_options.overline
+					? html`<div slot="overline">${_options.overline}</div>`
+					: null
+			}
 			<div slot="headline">${headline}</div>
-			${_options.supportingText
-				? html`<div slot="supporting-text">${_options.supportingText}</div>`
-				: null}
-			${_options.trailingSupportingText
-				? html`<div slot="trailing-supporting-text">
-						${_options.trailingSupportingText}
-					</div>`
-				: null}
+			${
+				_options.supportingText
+					? html`<div slot="supporting-text">${_options.supportingText}</div>`
+					: null
+			}
+			${
+				_options.trailingSupportingText
+					? html`<div slot="trailing-supporting-text">
+							${_options.trailingSupportingText}
+						</div>`
+					: null
+			}
 		</md-list-item>
 	`;
 }
@@ -366,11 +376,15 @@ export function SLIDER<T>(
 			(host[key] as number) = slider.value;
 		}
 	}
-	const assignValuesDebouncer = new Debouncer(assignValues, _options.timeoutMs);
+	const assignValuesDebouncer = new Debouncer(
+		assignValues,
+		_options.timeoutMs,
+		{throwOnCancel: false},
+	);
 	function eventCallBack(event: Event) {
 		if (event.type === _options.eventType) {
 			if (event.type === 'input') {
-				assignValuesDebouncer.call();
+				assignValuesDebouncer.debounce();
 			} else {
 				assignValues();
 			}
@@ -521,13 +535,15 @@ export function CHIPSELECT<T>(
 				@click=${onClick}
 				_positioning="popover"
 			>
-				${_options.leadingIcon
-					? typeof _options.leadingIcon === 'string'
-						? html`<md-icon slot="icon">${_options.leadingIcon}</md-icon>`
-						: html`<div slot="icon" style="--md-icon-size:18px;">
-								${_options.leadingIcon}
-							</div>`
-					: null}
+				${
+					_options.leadingIcon
+						? typeof _options.leadingIcon === 'string'
+							? html`<md-icon slot="icon">${_options.leadingIcon}</md-icon>`
+							: html`<div slot="icon" style="--md-icon-size:18px;">
+									${_options.leadingIcon}
+								</div>`
+						: null
+				}
 				<span>${host[key]}</span>
 				<md-icon slot="remove-trailing-icon" style="--md-icon-size:18px;">
 					arrow_drop_down
@@ -572,7 +588,8 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 		| 'time'
 		| 'datetime-local'
 		| 'url'
-		| 'email';
+		| 'email'
+		| 'password';
 	suffixText: string | undefined;
 	/** @default 'outlined' */
 	variant: 'filled' | 'outlined';
@@ -605,6 +622,14 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	 * Constrain input max length
 	 */
 	maxLength: number | undefined;
+
+	/**
+	 * A timeout used to debounce the input change event.
+	 * Useful for a search input to prevent running a resourceful function on each keys.
+	 *
+	 * @default 0
+	 */
+	// changeTimeoutMs: number;
 }
 
 /**
@@ -692,18 +717,20 @@ export function TEXTFIELD<T>(
 						}
 					}}
 				>
-					${typeof _options.resetButton === 'object' &&
-					_options.resetButton.icon
-						? typeof _options.resetButton.icon === 'string'
-							? html`<md-icon>${_options.resetButton.icon}</md-icon>`
-							: _options.resetButton.icon
-						: html`
-								<svg viewBox="0 96 960 960">
-									<path
-										d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"
-									/>
-								</svg>
-							`}
+					${
+						typeof _options.resetButton === 'object' &&
+						_options.resetButton.icon
+							? typeof _options.resetButton.icon === 'string'
+								? html`<md-icon>${_options.resetButton.icon}</md-icon>`
+								: _options.resetButton.icon
+							: html`
+									<svg viewBox="0 96 960 960">
+										<path
+											d="m249 849-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"
+										/>
+									</svg>
+								`
+					}
 				</md-icon-button>`
 			: null;
 
@@ -954,13 +981,17 @@ export function TOGGLEBUTTON<T>(
 				(<boolean>host[key]) = target.selected;
 			}}
 		>
-			${typeof _options.icon === 'string'
-				? html`<md-icon>${_options.icon}</md-icon>`
-				: _options.icon}
+			${
+				typeof _options.icon === 'string'
+					? html`<md-icon>${_options.icon}</md-icon>`
+					: _options.icon
+			}
 			<div slot="selected">
-				${typeof _options.selectedIcon === 'string'
-					? html`<md-icon>${_options.selectedIcon}</md-icon>`
-					: _options.selectedIcon}
+				${
+					typeof _options.selectedIcon === 'string'
+						? html`<md-icon>${_options.selectedIcon}</md-icon>`
+						: _options.selectedIcon
+				}
 			</div>
 		</md-filled-icon-button>
 	`;
