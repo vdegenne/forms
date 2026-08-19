@@ -204,23 +204,23 @@ export function SWITCH<T>(
 		..._options.style,
 	};
 	if (!customElements.get('md-list-item')) {
-		import('@material/web/list/list-item.js');
+		// import('@material/web/list/list-item.js');
 	}
 	if (!customElements.get('md-switch')) {
-		import('@material/web/switch/switch.js');
+		// import('@material/web/switch/switch.js');
 	}
 	return html`
 		<md-list-item
 			type="${_options.type}"
-			@click=${() => {
+			@click="${() => {
 				if (_options.disabled) {
 					return;
 				}
 				if (_options.type === 'button') {
 					(host[key] as boolean) = !host[key];
 				}
-			}}
-			@change=${(event: Event) => {
+			}}"
+			@change="${(event: Event) => {
 				if (_options.type === 'text') {
 					const target = event.target as HTMLElement;
 					if (_options.checkbox && target.nodeName === 'MD-CHECKBOX') {
@@ -235,9 +235,9 @@ export function SWITCH<T>(
 						);
 					}
 				}
-			}}
-			?disabled=${_options.disabled}
-			style=${ifDefined(_options.style ? styleMap(_options.style) : undefined)}
+			}}"
+			?disabled="${_options.disabled}"
+			style="${ifDefined(_options.style ? styleMap(_options.style) : undefined)}"
 		>
 			${
 				_options.position === 'trailing' && _options.leadingContent
@@ -392,7 +392,7 @@ export function SLIDER<T>(
 	}
 
 	if (!customElements.get('md-slider')) {
-		import('@material/web/slider/slider.js');
+		// import('@material/web/slider/slider.js');
 	}
 
 	return html`
@@ -697,7 +697,7 @@ export function TEXTFIELD<T>(
 
 		if (_options.resetButton) {
 			if (!customElements.get('md-icon-button')) {
-				import('@material/web/iconbutton/icon-button.js');
+				// import('@material/web/iconbutton/icon-button.js');
 			}
 		}
 
