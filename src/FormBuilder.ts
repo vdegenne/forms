@@ -658,20 +658,20 @@ export function TEXTFIELD<T>(
 		...options,
 	};
 	const promisesToWait = [];
-	let style: StaticValue;
+	let tagName: StaticValue;
 	switch (_options.variant) {
 		case 'filled':
 			// promisesToWait.push(
 			// 	import('@material/web/textfield/filled-text-field.js'),
 			// );
-			style = literal`filled`;
+			tagName = literal`md-filled-text-field`;
 			break;
 
 		case 'outlined':
 			// promisesToWait.push(
 			// 	import('@material/web/textfield/outlined-text-field.js'),
 			// );
-			style = literal`outlined`;
+			tagName = literal`md-outlined-text-field`;
 			break;
 	}
 
@@ -735,7 +735,7 @@ export function TEXTFIELD<T>(
 			: null;
 
 		return staticHtml`
-		<md-${style}-text-field
+		<${tagName}
 			?disabled=${_options.disabled}
 			${ref(textFieldRef)}
 			class="flex-1"
@@ -759,7 +759,7 @@ export function TEXTFIELD<T>(
 				: null
 		}
 		${resetButtonOrNot}
-		</md-${style}-text-field>
+		</${tagName}>
 	`;
 	};
 
