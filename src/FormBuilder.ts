@@ -630,6 +630,19 @@ interface TextFieldOptions extends SharedOptions<TextField> {
 	 * @default 0
 	 */
 	// changeTimeoutMs: number;
+
+	/**
+	 * When using type "number" you can set a min value for the input.
+	 *
+	 * @default ''
+	 */
+	min: string;
+	/**
+	 * When using type "number" you can set a max value for the input.
+	 *
+	 * @default ''
+	 */
+	max: string;
 }
 
 /**
@@ -655,6 +668,8 @@ export function TEXTFIELD<T>(
 		supportingText: undefined,
 		placeholder: undefined,
 		maxLength: undefined,
+		min: '',
+		max: '',
 		...options,
 	};
 	const promisesToWait = [];
@@ -705,7 +720,7 @@ export function TEXTFIELD<T>(
 			? html`<md-icon-button
 					slot="trailing-icon"
 					form=""
-					@click=${() => {
+					@click="${() => {
 						if (
 							typeof _options.resetButton === 'object' &&
 							_options.resetButton.callback
@@ -715,7 +730,7 @@ export function TEXTFIELD<T>(
 							(<string>host[key]) = '';
 							textfield().focus();
 						}
-					}}
+					}}"
 				>
 					${
 						typeof _options.resetButton === 'object' &&
@@ -736,20 +751,22 @@ export function TEXTFIELD<T>(
 
 		return staticHtml`
 		<${tagName}
-			?disabled=${_options.disabled}
+			?disabled="${_options.disabled}"
 			${ref(textFieldRef)}
 			class="flex-1"
-			?autofocus=${_options.autofocus}
-			label=${label.replace(/\*/g, '')}
-			type=${_options.type}
-			.rows=${_options.rows}
-			?required=${_options.required || label.includes('*')}
-			suffix-text=${ifDefined(_options.suffixText)}
-			supporting-text=${ifDefined(_options.supportingText)}
-			style=${ifDefined(_options.style ? styleMap(_options.style) : undefined)}
+			?autofocus="${_options.autofocus}"
+			label="${label.replace(/\*/g, '')}"
+			type="${_options.type}"
+			min="${_options.min}"
+			max="${_options.max}"
+			.rows="${_options.rows}"
+			?required="${_options.required || label.includes('*')}"
+			suffix-text="${ifDefined(_options.suffixText)}"
+			supporting-text="${ifDefined(_options.supportingText)}"
+			style="${ifDefined(_options.style ? styleMap(_options.style) : undefined)}"
 			${bindInput(host, key)}
-			placeholder=${ifDefined(_options.placeholder)}
-			maxlength=${_options.maxLength ?? nothing}
+			placeholder="${ifDefined(_options.placeholder)}"
+			maxlength="${_options.maxLength ?? nothing}"
 		>
 		${
 			_options.leadingIcon
