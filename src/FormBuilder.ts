@@ -424,9 +424,17 @@ export function SLIDER<T>(
 }
 
 interface SelectOptions extends SharedOptions<Select> {
+	/**
+	 * @default 'popover'
+	 */
 	menuPositioning: 'popover' | 'fixed' | 'absolute';
 
 	supportingText: string | undefined;
+
+	/**
+	 * @default 'string'
+	 */
+	type: 'string' | 'number';
 }
 
 /**
@@ -442,24 +450,26 @@ export function SELECT<T>(
 ) {
 	const _options: SelectOptions = {
 		...DEFAULT_SHARED_OPTIONS,
-		menuPositioning: 'absolute',
+		menuPositioning: 'popover',
 		supportingText: undefined,
-		...(options ?? {}),
+		type: 'string',
+		...options,
 	};
 	const _select = createRef<MdFilledSelect>();
 	return html`
 		<md-filled-select
 			${ref(_select)}
-			?disabled=${_options.disabled}
+			?disabled="${_options.disabled}"
 			quick
-			menu-positioning=${_options.menuPositioning}
-			value=${choices.indexOf(host[key] as string)}
-			label=${label}
+			menu-positioning="${_options.menuPositioning}"
+			value="${_options.type === 'number' ? host[key] : choices.indexOf(host[key] as string)}"
+			label="${label}"
 			@change="${() => {
 				const index = _select.value.selectedIndex;
-				(host[key] as string) = choices[index];
+				(host[key] as string | number) =
+					_options.type === 'number' ? index : choices[index];
 			}}"
-			supporting-text=${ifDefined(_options.supportingText)}
+			supporting-text="${ifDefined(_options.supportingText)}"
 			style="${ifDefined(
 				_options.style ? styleMap(_options.style) : undefined,
 			)}"
