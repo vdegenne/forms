@@ -327,7 +327,7 @@ interface SliderOptions extends SharedOptions<Slider> {
 	timeoutMs: number;
 
 	/**
-	 * @default false
+	 * @default true
 	 */
 	ticks: boolean;
 
@@ -361,7 +361,7 @@ export function SLIDER<T>(
 		range: false,
 		eventType: 'input',
 		timeoutMs: 0,
-		ticks: false,
+		ticks: true,
 		persistLabel: false,
 		labeled: true,
 		...options,
