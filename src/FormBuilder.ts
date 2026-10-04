@@ -455,25 +455,17 @@ export function SELECT<T>(
 		type: 'string',
 		...options,
 	};
-
 	const _select = createRef<MdFilledSelect>();
-
-	const selectedIndex =
-		_options.type === 'number'
-			? Number(host[key])
-			: choices.indexOf(host[key] as string);
-
 	return html`
 		<md-filled-select
 			${ref(_select)}
 			?disabled="${_options.disabled}"
 			quick
 			menu-positioning="${_options.menuPositioning}"
-			value="${selectedIndex}"
+			.value="${_options.type === 'number' ? host[key] : choices.indexOf(host[key] as string)}"
 			label="${label}"
 			@change="${() => {
 				const index = _select.value.selectedIndex;
-
 				(host[key] as string | number) =
 					_options.type === 'number' ? index : choices[index];
 			}}"
@@ -484,7 +476,7 @@ export function SELECT<T>(
 		>
 			${choices.map(
 				(item, id) => html`
-					<md-select-option value="${id}"> ${item} </md-select-option>
+					<md-select-option value=${id}>${item}</md-select-option>
 				`,
 			)}
 		</md-filled-select>
