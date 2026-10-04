@@ -26,7 +26,7 @@ function isElement(target: EventTarget): target is Element {
  * @return {boolean}
  */
 function isInputElement(target: EventTarget): target is HTMLInputElement {
-	return isElement(target) && (target.nodeName === 'INPUT' || 'type' in target);
+	return isElement(target) && target.nodeName === 'INPUT';
 }
 
 /**
@@ -38,14 +38,14 @@ function isSelectElement(target: EventTarget): target is HTMLSelectElement {
 	return isElement(target) && target.nodeName === 'SELECT';
 }
 
-///**
-// * Determines if a target is a textarea element
-// * @param {EventTarget} target Target to test
-// * @return {boolean}
-// */
-//function isTextAreaElement(target: EventTarget): target is HTMLTextAreaElement {
-//  return isElement(target) && target.nodeName === 'TEXTAREA';
-//}
+/**
+ * Determines if a target is a textarea element
+ * @param {EventTarget} target Target to test
+ * @return {boolean}
+ */
+function isTextAreaElement(target: EventTarget): target is HTMLTextAreaElement {
+	return isElement(target) && target.nodeName === 'TEXTAREA';
+}
 
 /**
  * Tracks the value of a form control and propagates data two-way to/from a
@@ -56,6 +56,7 @@ class BindInputDirective extends AsyncDirective {
 	private __prop?: PropertyLike;
 	private __host: unknown | undefined = undefined;
 	private __lastValue: unknown = undefined;
+	private __hasValue = false;
 	private __isAttribute: boolean;
 
 	/** @inheritdoc */
@@ -83,6 +84,7 @@ class BindInputDirective extends AsyncDirective {
 		if (this.__isAttribute) {
 			return this.__computeValueFromHost(host, prop);
 		}
+
 		return nothing;
 	}
 
@@ -93,14 +95,17 @@ class BindInputDirective extends AsyncDirective {
 	): unknown {
 		if (part.element !== this.__element) {
 			this.__setElement(part.element);
+			this.__hasValue = false;
 		}
 
 		if (prop !== this.__prop) {
 			this.__prop = prop;
+			this.__hasValue = false;
 		}
 
 		if (host !== this.__host) {
 			this.__host = host;
+			this.__hasValue = false;
 		}
 
 		if (host && !this.__isAttribute) {
@@ -131,30 +136,32 @@ class BindInputDirective extends AsyncDirective {
 	 * @return {void}
 	 */
 	private __updateValueFromHost(host: unknown): void {
-		if (!this.__prop || !this.__element) {
+		if (this.__prop === undefined || !this.__element) {
 			return;
 		}
 
 		const value = this.__computeValueFromHost(host, this.__prop);
 		const element = this.__element;
 
-		if (value === this.__lastValue) {
+		// Always synchronize the first value, even when it is undefined.
+		if (this.__hasValue && value === this.__lastValue) {
 			return;
 		}
 
+		this.__hasValue = true;
 		this.__lastValue = value;
 
 		if (isSelectElement(element)) {
 			switch (element.type.toLowerCase()) {
-				case 'select-multiple':
+				case 'select-multiple': {
 					const valuesArray = Array.isArray(value) ? value : [value];
 
 					for (const opt of element.options) {
-						if (valuesArray.includes(opt.value)) {
-							opt.selected = true;
-						}
+						opt.selected = valuesArray.includes(opt.value);
 					}
 					break;
+				}
+
 				case 'select-one':
 				default:
 					element.value = String(value ?? '');
@@ -164,18 +171,24 @@ class BindInputDirective extends AsyncDirective {
 				case 'checkbox':
 					element.checked = value === true;
 					break;
+
 				case 'number':
+					element.valueAsNumber = typeof value === 'number' ? value : NaN;
+					break;
+
 				case 'date':
 				case 'time':
 				case 'datetime-local':
-					element.valueAsNumber = value as number;
+					element.value = typeof value === 'string' ? value : '';
 					break;
-				case 'textarea':
+
 				default:
 					element.value = String(value ?? '');
 			}
+		} else if (isTextAreaElement(element)) {
+			element.value = String(value ?? '');
 		} else if ('value' in element) {
-			element.value = value;
+			(element as Element & {value: unknown}).value = value;
 		}
 	}
 
@@ -222,7 +235,7 @@ class BindInputDirective extends AsyncDirective {
 	private __onChange = (ev: Event): void => {
 		const target = ev.currentTarget;
 
-		if (target !== this.__element) {
+		if (target !== this.__element || !this.__element) {
 			return;
 		}
 
@@ -242,6 +255,7 @@ class BindInputDirective extends AsyncDirective {
 				case 'select-multiple':
 					value = [...element.selectedOptions].map((opt) => opt.value);
 					break;
+
 				case 'select-one':
 				default:
 					value = element.value;
@@ -251,18 +265,24 @@ class BindInputDirective extends AsyncDirective {
 				case 'checkbox':
 					value = element.checked === true;
 					break;
+
 				case 'number':
+					value = element.valueAsNumber;
+					break;
+
 				case 'date':
 				case 'time':
 				case 'datetime-local':
-					value = element.valueAsNumber;
+					value = element.value;
 					break;
-				case 'textarea':
+
 				default:
 					value = element.value;
 			}
-		} else if ('value' in element) {
+		} else if (isTextAreaElement(element)) {
 			value = element.value;
+		} else if ('value' in element) {
+			value = (element as Element & {value: unknown}).value;
 		}
 
 		return value;
@@ -274,7 +294,7 @@ class BindInputDirective extends AsyncDirective {
 	 * @return {void}
 	 */
 	private __updateValueFromElement(element: Element): void {
-		if (!this.__prop) {
+		if (this.__prop === undefined) {
 			return;
 		}
 
@@ -289,6 +309,7 @@ class BindInputDirective extends AsyncDirective {
 		const value = this.__getValueFromElement(element);
 
 		this.__lastValue = value;
+		this.__hasValue = true;
 
 		(this.__host as Record<PropertyLike, unknown>)[this.__prop] = value;
 	}
@@ -301,7 +322,7 @@ class BindInputDirective extends AsyncDirective {
 	private __onInput = (ev: Event): void => {
 		const target = ev.currentTarget;
 
-		if (target !== this.__element) {
+		if (target !== this.__element || !this.__element) {
 			return;
 		}
 
@@ -332,12 +353,12 @@ const bindInputDirective = directive(BindInputDirective);
  *
  * ```ts
  * html`
- *  <input type="text" ${input(this, 'name')}>
+ * 	<input type="text" ${bindInput(this, 'name')}>
  * `;
  * ```
  *
  * @param {T} host Host object of the property
- * @param {string} key Property to bind
+ * @param {TKey} key Property to bind
  * @return {DirectiveResult}
  */
 export function bindInput<T, TKey extends keyof T>(
