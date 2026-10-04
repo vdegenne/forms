@@ -456,11 +456,6 @@ export function SELECT<T>(
 		...options,
 	};
 	const _select = createRef<MdFilledSelect>();
-	console.log(
-		_options.type === 'number'
-			? host[key]
-			: choices.indexOf(host[key] as string),
-	);
 	return html`
 		<md-filled-select
 			${ref(_select)}
@@ -470,7 +465,6 @@ export function SELECT<T>(
 			value="${_options.type === 'number' ? host[key] : choices.indexOf(host[key] as string)}"
 			label="${label}"
 			@change="${() => {
-				console.log('???????????????????????');
 				const index = _select.value.selectedIndex;
 				(host[key] as string | number) =
 					_options.type === 'number' ? index : choices[index];
@@ -482,7 +476,9 @@ export function SELECT<T>(
 		>
 			${choices.map(
 				(item, id) => html`
-					<md-select-option value=${id}>${item}</md-select-option>
+					<md-select-option value="${_options.type === 'number' ? id : item}"
+						>${item}</md-select-option
+					>
 				`,
 			)}
 		</md-filled-select>
