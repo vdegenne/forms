@@ -456,15 +456,21 @@ export function SELECT<T>(
 		...options,
 	};
 	const _select = createRef<MdFilledSelect>();
+	console.log(
+		_options.type === 'number'
+			? host[key]
+			: choices.indexOf(host[key] as string),
+	);
 	return html`
 		<md-filled-select
 			${ref(_select)}
 			?disabled="${_options.disabled}"
 			quick
 			menu-positioning="${_options.menuPositioning}"
-			.value="${_options.type === 'number' ? host[key] : choices.indexOf(host[key] as string)}"
+			value="${_options.type === 'number' ? host[key] : choices.indexOf(host[key] as string)}"
 			label="${label}"
 			@change="${() => {
+				console.log('???????????????????????');
 				const index = _select.value.selectedIndex;
 				(host[key] as string | number) =
 					_options.type === 'number' ? index : choices[index];
