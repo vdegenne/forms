@@ -462,7 +462,7 @@ export function SELECT<T>(
 			?disabled="${_options.disabled}"
 			quick
 			menu-positioning="${_options.menuPositioning}"
-			value="${_options.type === 'number' ? host[key] : choices.indexOf(host[key] as string)}"
+			value="${host[key]}"
 			label="${label}"
 			@change="${() => {
 				const index = _select.value.selectedIndex;
