@@ -435,6 +435,11 @@ interface SelectOptions extends SharedOptions<Select> {
 	 * @default 'string'
 	 */
 	type: 'string' | 'number';
+
+	/**
+	 * @default 'none'
+	 */
+	sorting: 'none' | 'alphabet';
 }
 
 /**
@@ -453,32 +458,51 @@ export function SELECT<T>(
 		menuPositioning: 'popover',
 		supportingText: undefined,
 		type: 'string',
+		sorting: 'none',
 		...options,
 	};
+
 	const _select = createRef<MdFilledSelect>();
+
+	const _choices: [string, number][] = choices.map((item, index) => [
+		item,
+		index,
+	]);
+
+	if (_options.sorting === 'alphabet') {
+		_choices.sort(([a], [b]) => a.localeCompare(b));
+	}
+
 	return html`
 		<md-filled-select
 			${ref(_select)}
 			?disabled="${_options.disabled}"
 			quick
 			menu-positioning="${_options.menuPositioning}"
-			value="${host[key]}"
 			label="${label}"
 			@change="${() => {
-				const index = _select.value.selectedIndex;
+				const [item, index] = _choices[_select.value.selectedIndex];
+
 				(host[key] as string | number) =
-					_options.type === 'number' ? index : choices[index];
+					_options.type === 'number' ? index : item;
 			}}"
 			supporting-text="${ifDefined(_options.supportingText)}"
 			style="${ifDefined(
 				_options.style ? styleMap(_options.style) : undefined,
 			)}"
 		>
-			${choices.map(
-				(item, id) => html`
-					<md-select-option value="${_options.type === 'number' ? id : item}"
-						>${item}</md-select-option
+			${_choices.map(
+				([item, index]) => html`
+					<md-select-option
+						?selected="${
+							_options.type === 'number'
+								? host[key] === index
+								: host[key] === item
+						}"
+						value="${item}"
 					>
+						${item}
+					</md-select-option>
 				`,
 			)}
 		</md-filled-select>
