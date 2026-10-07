@@ -440,6 +440,8 @@ interface SelectOptions extends SharedOptions<Select> {
 	 * @default 'none'
 	 */
 	sorting: 'none' | 'alphabet';
+
+	displayValues: readonly string[] | undefined;
 }
 
 /**
@@ -459,18 +461,20 @@ export function SELECT<T>(
 		supportingText: undefined,
 		type: 'string',
 		sorting: 'none',
+		displayValues: undefined,
 		...options,
 	};
 
 	const _select = createRef<MdFilledSelect>();
 
-	const _choices: [string, number][] = choices.map((item, index) => [
+	const _choices: [string, string, number][] = choices.map((item, index) => [
 		item,
+		_options.displayValues?.[index] ?? item,
 		index,
 	]);
 
 	if (_options.sorting === 'alphabet') {
-		_choices.sort(([a], [b]) => a.localeCompare(b));
+		_choices.sort(([, a], [, b]) => a.localeCompare(b));
 	}
 
 	return html`
@@ -481,7 +485,7 @@ export function SELECT<T>(
 			menu-positioning="${_options.menuPositioning}"
 			label="${label}"
 			@change="${() => {
-				const [item, index] = _choices[_select.value.selectedIndex];
+				const [item, , index] = _choices[_select.value.selectedIndex];
 
 				(host[key] as string | number) =
 					_options.type === 'number' ? index : item;
@@ -492,7 +496,7 @@ export function SELECT<T>(
 			)}"
 		>
 			${_choices.map(
-				([item, index]) => html`
+				([item, displayValue, index]) => html`
 					<md-select-option
 						?selected="${
 							_options.type === 'number'
@@ -501,7 +505,7 @@ export function SELECT<T>(
 						}"
 						value="${item}"
 					>
-						${item}
+						${displayValue}
 					</md-select-option>
 				`,
 			)}
