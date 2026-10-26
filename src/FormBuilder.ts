@@ -518,6 +518,8 @@ interface ChipSelectOptions extends SharedOptions<Chip> {
 	 * @default html`<md-icon>sort</md-icon>`
 	 */
 	leadingIcon: string | TemplateResult | undefined;
+
+	displayValues: readonly string[] | undefined;
 }
 
 // MdInputChip.elementStyles.push(css`
@@ -544,7 +546,8 @@ export function CHIPSELECT<T>(
 	const _options: ChipSelectOptions = {
 		...DEFAULT_SHARED_OPTIONS,
 		leadingIcon: html`<md-icon>sort</md-icon>`,
-		...(options ?? {}),
+		displayValues: undefined,
+		...options,
 	};
 
 	const menuRef = createRef<MdMenu>();
@@ -566,6 +569,11 @@ export function CHIPSELECT<T>(
 		menu().open = !menu().open;
 	};
 
+	const _choices = choices.map((item, index) => ({
+		item,
+		displayValue: _options.displayValues?.[index] ?? item,
+	}));
+
 	return html`
 		<md-chip-set class="relative">
 			<md-input-chip
@@ -584,7 +592,9 @@ export function CHIPSELECT<T>(
 								</div>`
 						: null
 				}
-				<span>${host[key]}</span>
+				<span
+					>${_choices.find(({item}) => item === host[key])?.displayValue ?? host[key]}</span
+				>
 				<md-icon slot="remove-trailing-icon" style="--md-icon-size:18px;">
 					arrow_drop_down
 				</md-icon>
@@ -604,10 +614,10 @@ export function CHIPSELECT<T>(
 					}
 				}}
 			>
-				${choices.map(
-					(choice) =>
+				${_choices.map(
+					({item, displayValue}) =>
 						html`<md-menu-item>
-							<div slot="headline">${choice}</div>
+							<div slot="headline">${displayValue}</div>
 						</md-menu-item>`,
 				)}
 			</md-menu>
