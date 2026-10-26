@@ -1,6 +1,6 @@
 {
 	"name": "@vdegenne/forms",
-	"version": "0.1.91",
+	"version": "0.1.92",
 	"type": "module",
 	"scripts": {
 		"build": "wireit"
@@ -22,7 +22,7 @@
 		"@material/web": "^2.5.0",
 		"lit": "^3.3.3",
 		"typescript": "^7.0.2",
-		"wireit": "^0.14.13"
+		"wireit": "^0.15.0"
 	},
 	"dependencies": {
 		"@vdegenne/debouncer": "^1.0.17"

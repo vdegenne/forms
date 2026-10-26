@@ -604,15 +604,22 @@ export function CHIPSELECT<T>(
 				quick
 				${ref(menuRef)}
 				anchor="chip"
-				@close-menu=${(event: CloseMenuEvent) => {
+				@close-menu="${(event: CloseMenuEvent) => {
 					const {
 						reason: {kind: reason},
 						initiator,
 					} = event.detail;
+
 					if (reason === 'click-selection') {
-						(host[key] as string) = initiator.typeaheadText;
+						const choice = _choices.find(
+							({displayValue}) => displayValue === initiator.typeaheadText,
+						);
+
+						if (choice) {
+							(host[key] as string) = choice.item;
+						}
 					}
-				}}
+				}}"
 			>
 				${_choices.map(
 					({item, displayValue}) =>
