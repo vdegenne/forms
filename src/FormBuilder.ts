@@ -582,13 +582,14 @@ export function CHIPSELECT<T>(
 
 	return html`
 		<md-chip-set class="relative">
-			<md-input-chip
+			<md-filter-chip
 				id="chip"
 				${ref(chipRef)}
 				@remove="${onClick}"
 				@click="${onClick}"
 				?elevated="${_options.elevated}"
 				_positioning="popover"
+				removable
 			>
 				${
 					_options.leadingIcon
@@ -605,7 +606,7 @@ export function CHIPSELECT<T>(
 				<md-icon slot="remove-trailing-icon" style="--md-icon-size:18px;">
 					arrow_drop_down
 				</md-icon>
-			</md-input-chip>
+			</md-filter-chip>
 
 			<md-menu
 				quick
