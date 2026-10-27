@@ -520,6 +520,11 @@ interface ChipSelectOptions extends SharedOptions<Chip> {
 	leadingIcon: string | TemplateResult | undefined;
 
 	displayValues: readonly string[] | undefined;
+
+	/**
+	 * @default false
+	 */
+	elevated: boolean;
 }
 
 // MdInputChip.elementStyles.push(css`
@@ -547,6 +552,7 @@ export function CHIPSELECT<T>(
 		...DEFAULT_SHARED_OPTIONS,
 		leadingIcon: html`<md-icon>sort</md-icon>`,
 		displayValues: undefined,
+		elevated: false,
 		...options,
 	};
 
@@ -579,8 +585,9 @@ export function CHIPSELECT<T>(
 			<md-input-chip
 				id="chip"
 				${ref(chipRef)}
-				@remove=${onClick}
-				@click=${onClick}
+				@remove="${onClick}"
+				@click="${onClick}"
+				?elevated="${_options.elevated}"
 				_positioning="popover"
 			>
 				${
