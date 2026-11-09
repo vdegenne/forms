@@ -909,13 +909,13 @@ type StringOrNumber = string | number;
  * import '@material/web/chips/chip-set.js'
  * import '@material/web/chips/filter-chip.js'
  */
-export const FILTER = <T>(
+export function FILTER<T>(
 	label: string,
 	host: T,
 	key: keyof T,
 	choices: string[],
 	options?: Partial<FilterOptions>,
-) => {
+) {
 	const _options: FilterOptions = {
 		...DEFAULT_SHARED_OPTIONS,
 		behavior: FilterBehavior.ZeroOrMore,
@@ -946,9 +946,9 @@ export const FILTER = <T>(
 			${label ? html` <div>${label}</div>` : null}
 			<md-chip-set
 				class="justify-stretch"
-				?autofocus=${_options.autofocus}
+				?autofocus="${_options.autofocus}"
 				${ref(chipsetref)}
-				@click=${async (event: PointerEvent) => {
+				@click="${async (event: PointerEvent) => {
 					const chipset = chipsetref.value!;
 					const chips = chipset.chips as MdFilterChip[];
 					const chip = event.target as MdFilterChip;
@@ -978,27 +978,28 @@ export const FILTER = <T>(
 
 					(host[key] as StringOrNumber | StringOrNumber[]) =
 						_options.behavior === 'only-one' ? values[0] : values;
-				}}
+				}}"
 			>
 				${_choices.map(
 					(choice) => html`
 						<md-filter-chip
-							?elevated=${_options.elevated}
-							?selected=${[]
+							?elevated="${_options.elevated}"
+							?selected="${[]
 								.concat(host[key] as StringOrNumber[])
 								.includes(
 									_options.type === 'string' ? choice.value : choice.index,
-								)}
-							data-value=${choice.value}
-							data-index=${choice.index}
-							label=${choice.value}
+								)}"
+							data-value="${choice.value}"
+							data-index="${choice.index}"
+							label="${choice.value}"
+							?disabled="${_options.disabled}"
 						></md-filter-chip>
 					`,
 				)}
 			</md-chip-set>
 		</div>
 	`;
-};
+}
 
 export const INPUT = <T>(
 	label: string,
