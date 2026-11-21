@@ -1,6 +1,6 @@
 {
 	"name": "@vdegenne/forms",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"type": "module",
 	"scripts": {
 		"build": "wireit"
@@ -28,7 +28,7 @@
 		"@vdegenne/debouncer": "^1.0.17"
 	},
 	"peerDependencies": {
-		"@material/web": ">=2.0.0-0 <3.0.0 || >=2.5.1-nightly.0",
+		"@material/web": "^2.0.0 || ^2.5.1-0",
 		"lit": "^3.0.0"
 	},
 	"files": [
