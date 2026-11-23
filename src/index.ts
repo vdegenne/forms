@@ -209,7 +209,7 @@ export function SWITCH<T>(
 		// import('@material/web/switch/switch.js');
 	}
 	return html`
-		<md-list-item
+		<md-gb-list-item
 			type="${_options.type}"
 			@click="${() => {
 				if (_options.disabled) {
@@ -240,26 +240,26 @@ export function SWITCH<T>(
 		>
 			${
 				_options.position === 'trailing' && _options.leadingContent
-					? html`<div slot="start">${_options.leadingContent}</div>`
+					? html`<div slot="leading">${_options.leadingContent}</div>`
 					: null
 			}
 			${
 				_options.checkbox
 					? html`
-							<md-checkbox
-								slot="${_options.position === 'leading' ? 'start' : 'end'}"
-								?checked=${host[key]}
-								?inert=${_options.type === 'button'}
-								?disabled=${_options.disabled}
-							></md-checkbox>
+							<md-gb-checkbox
+								slot="${_options.position === 'leading' ? 'leading' : 'trailing'}"
+								?checked="${host[key]}"
+								?inert="${_options.type === 'button'}"
+								?disabled="${_options.disabled}"
+							></md-gb-checkbox>
 						`
 					: html`
-							<md-switch
-								slot="${_options.position === 'leading' ? 'start' : 'end'}"
-								?selected=${host[key]}
-								?inert=${_options.type === 'button'}
-								?disabled=${_options.disabled}
-							></md-switch>
+							<md-gb-switch
+								slot="${_options.position === 'leading' ? 'leading' : 'trailing'}"
+								?selected="${host[key]}"
+								?inert="${_options.type === 'button'}"
+								?disabled="${_options.disabled}"
+							></md-gb-switch>
 						`
 			}
 			${
@@ -267,7 +267,7 @@ export function SWITCH<T>(
 					? html`<div slot="overline">${_options.overline}</div>`
 					: null
 			}
-			<div slot="headline">${headline}</div>
+			${headline}
 			${
 				_options.supportingText
 					? html`<div slot="supporting-text">${_options.supportingText}</div>`
@@ -275,12 +275,12 @@ export function SWITCH<T>(
 			}
 			${
 				_options.trailingSupportingText
-					? html`<div slot="trailing-supporting-text">
+					? html`<div slot="trailing-text">
 							${_options.trailingSupportingText}
 						</div>`
 					: null
 			}
-		</md-list-item>
+		</md-gb-list-item>
 	`;
 }
 
@@ -965,23 +965,46 @@ export function FILTER<T>(
 				?autofocus="${_options.autofocus}"
 				?disabled="${_options.disabled}"
 				${ref(chipsetref)}
-				@change="${() => {
-					const values = [].concat(
-						chipsetref.value!.value as string | string[],
-					);
+				@change="${(event: Event) => {
+					if (!_options.required || _options.selection !== 'multiple') return;
+
+					const chips = Array.from(
+						chipsetref.value!.querySelectorAll('md-gb-chip'),
+					) as (HTMLElement & {selected: boolean})[];
+
+					const selected = chips.filter((chip) => chip.selected);
+
+					if (selected.length === 0) {
+						(event.target as HTMLElement & {selected: boolean}).selected = true;
+					}
+
+					const values = chips
+						.filter((chip) => chip.selected)
+						.map((chip) => chip.getAttribute('value')!);
 
 					const result =
 						_options.type === 'string' ? values : values.map(Number);
 
-					(host[key] as StringOrNumber | StringOrNumber[]) =
-						_options.selection === 'single' ? result[0] : result;
+					const current: StringOrNumber[] = [].concat(
+						host[key] as StringOrNumber | StringOrNumber[],
+					);
+
+					const next: StringOrNumber[] = result;
+
+					const unchanged =
+						current.length === next.length &&
+						current.every((value) => next.includes(value));
+
+					if (!unchanged) {
+						(host[key] as StringOrNumber | StringOrNumber[]) = result;
+					}
 				}}"
 			>
 				${_choices.map(
 					(choice) => html`
 						<md-gb-chip
 							type="filter"
-							?elevated="${_options.elevated}"
+							color="${_options.elevated ? 'elevated' : 'initial'}"
 							?selected="${[]
 								.concat(host[key] as StringOrNumber[])
 								.includes(
